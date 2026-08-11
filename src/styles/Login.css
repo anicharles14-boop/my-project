@@ -1,0 +1,170 @@
+
+.shield{    
+    width:80px;
+    margin-top: 15px;
+}
+
+h1{
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+.login-page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.login-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 580px;
+    border: none;
+    box-shadow: 0px 0px 9px lightblue;
+    width: 450px;
+    border-radius: 10px;
+    background-color: white;
+    
+}
+.ep-input-login{
+    position: relative;
+}
+.ep-input-login input{
+
+    width:100%;
+    margin-bottom: 20px;
+    border: 1px solid;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0px 0px 3px rgb(188, 191, 194) ;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 45px;
+}
+.ep-input-login label{
+    line-height: 40px;
+    font-weight: 400;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 15px;
+
+
+    
+}
+.ep-input-login input::placeholder{
+    color: #61656e;
+    font-weight: ;
+}
+.login-options{
+    display: flex;
+    justify-content:flex-end;
+    gap: 139px;
+    margin-bottom: 20px;
+    background-color: white;
+}
+.signin{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+.signin button{
+        
+    width:388px;
+    border: none;
+    border-radius: 5px;
+    border-top: 1px solid rgb(214, 207, 207);
+    box-shadow: 0px 2px 3px grey   ;
+    padding-top: 10px;
+    padding-bottom: 10px;  
+    font-family:"inter", sans-serif;
+    font-size: 15px;
+    transition: all 0.25s ease;
+
+}
+.signin-btn{
+    background-color: #2563EB;
+    color:white;
+    position: relative;
+}
+.signin-google{
+    position: relative;
+    background-color: white;
+    color:black;
+    display: flex;
+    justify-content: center;
+    gap:10px
+
+}
+.signin-btn:hover{
+    background-color: #1D4ED8;
+
+    transform: translateY(-1px);
+}
+.signin-google:hover{
+    transform: translateY(-1px);
+    background-color: rgb(247, 244, 244);
+}
+.line {
+    display: flex;
+    align-items: center;
+    width: 30px;
+    margin: 20px ;
+    width:100%;
+}
+.line hr {
+    flex: 1;
+    border-top: 1px solid #d1d5db;
+    
+}
+.line span {
+    margin: 0 12px;
+    color: #61656e;
+    font-size: 13px;
+    background: white;
+    font-family: sans-serif;
+}
+.signin p{
+    color:#61656e
+}
+
+
+    /*Image Positioning*/
+.email{
+    width:20px;
+    position: absolute;
+    top:51px;
+    left:10px
+}
+.lock{
+    position: absolute;
+    top:148px;
+    left:10px;
+    width:20px;
+
+}
+.eye{
+    position: absolute;
+    top:149px;
+    left:354px;
+    width:20px;
+
+}
+.signin-lock-signin{
+    width:18px;
+    position: absolute;
+    left: 145px;
+    top: 25%;
+}
+.google-signin{
+    width:18px;
+    position: absolute;
+    left: 100px;
+    top: 25%;
+
+}
+a{
+    text-decoration: underline;
+    color: #2567EB;
+    
+}

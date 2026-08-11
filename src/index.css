@@ -1,0 +1,17 @@
+*{
+  box-sizing: border-box;
+}
+body{
+  margin: 0;
+  padding:0;
+  background-color: aliceblue;
+  
+}
+.universal-layout{
+  display: flex;
+}
+.layout{
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
