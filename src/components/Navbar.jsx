@@ -1,5 +1,7 @@
 import "../styles/Navbar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../config/firebase";
 import dashboard from "../assets/dashboard.svg";
 import shieldHalf from "../assets/shield-half.svg";
 import student from "../assets/student.svg";
@@ -10,6 +12,17 @@ import logout from "../assets/logout.svg"
 
 function Navbar(){
     
+    const navigate = useNavigate();
+
+    async function handleLogout(){
+        try{
+            await signOut(auth);
+            navigate("/")
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
     return(
 
         <div className="navbar-container">
@@ -62,7 +75,7 @@ function Navbar(){
                     </div>
                 </Link>
                 
-                <Link className="link">
+                <Link className="link" onClick={handleLogout}>
                     <div className="navbar-logout">
                         <img src={logout}/>
                         

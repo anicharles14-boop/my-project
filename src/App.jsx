@@ -9,6 +9,7 @@ import Student from './components/Students';
 import Evaluation from './components/Evaluation';
 import Report from './components/Report';
 import Setting from './components/Settings';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 
@@ -24,24 +25,30 @@ const router = createBrowserRouter([
     element:<Signup/>
   },
   {
-    path:"/dashboard",
-    element:<Dashboard/>
-  },
-  {
-    path:"/student",
-    element:<Student/>
-  },
-  {
-    path:"/evaluation",
-    element:<Evaluation/>
-  },
-  {
-    path:"/report",
-    element:<Report/>
-  },
-  {
-    path:"/setting",
-    element:<Setting/>
+    element: <ProtectedRoute/>,
+    children: [
+      {
+        path:"/dashboard",
+        element:<Dashboard/>
+      },
+      {
+        path:"/student",
+        element:<Student/>
+      },
+      {
+        path:"/evaluation",
+        element:<Evaluation/>
+      },
+      {
+        path:"/report",
+        element:<Report/>
+      },
+      {
+        path:"/setting",
+        element:<Setting/>
+      }
+    ]
+
   }
 
   
