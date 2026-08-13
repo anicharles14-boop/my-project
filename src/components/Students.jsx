@@ -41,6 +41,7 @@ function Student(){
     const [search, setSearch] = useState("");
     /*popup*/
     const [showModal, setShowModal] = useState(false);
+    const [editingStudent, setEditingStudent] = useState(null);
     const [matric, setMatric] = useState("");
     const [name, setName] = useState("");
     const [department, setDepartment] = useState("");
@@ -48,30 +49,63 @@ function Student(){
 
      // Add student function
     const handleAddStudent = (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        const newStudent = {
-            matric: matric,
-            name: name,
-            department: department,
-            level: level,
-        };
+    const studentData = {
+        matric: matric,
+        name: name,
+        department: department,
+        level: level,
+    };
 
-        // Add new student to the existing students
+    if (editingStudent) {
+
+        setStudents((previousStudents) =>
+            previousStudents.map((student) =>
+                student.matric === editingStudent.matric
+                    ? studentData
+                    : student
+            )
+        );
+
+    } else {
+
         setStudents((previousStudents) => [
             ...previousStudents,
-            newStudent,
+            studentData,
         ]);
 
-        // Clear form
-        setMatric("");
-        setName("");
-        setDepartment("");
-        setLevel("");
+    }
 
-        // Close modal
-        setShowModal(false);
+    setMatric("");
+    setName("");
+    setDepartment("");
+    setLevel("");
+
+    setEditingStudent(null);
+    setShowModal(false);
     };
+
+    const handleEditStudent = (student) => {
+        setEditingStudent(student);
+
+        setMatric(student.matric);
+        setName(student.name);
+        setDepartment(student.department);
+        setLevel(student.level);
+
+        setShowModal(true);
+    };
+
+    const handleDeleteStudent = (matric) => {
+        setStudents((previousStudents) =>
+            previousStudents.filter(
+                (student) => student.matric !== matric
+            )
+        );
+    };
+
+
 
 
     const filteredStudents = students.filter((student) =>
@@ -95,7 +129,14 @@ function Student(){
                     
                     <div className="add-student-button">
                         <button
-                            onClick={() => setShowModal(true)}>
+                            onClick={() => {
+                                setEditingStudent(null);
+                                setMatric("");
+                                setName("");
+                                setDepartment("");
+                                setLevel("");
+                                setShowModal(true);
+                            }}>
                             + Add Student
                         </button>
                     </div>
@@ -153,12 +194,20 @@ function Student(){
                                         <td>
                                             <div className="action-buttons">
 
-                                                <button className="edit-btn" title="Edit">
-                                                ✎
+                                                <button
+                                                    className="edit-btn"
+                                                    title="Edit"
+                                                    onClick={() => handleEditStudent(student)}
+                                                >
+                                                    ✎
                                                 </button>
 
-                                                <button className="delete-btn" title="Delete">
-                                                🗑
+                                                <button
+                                                    className="delete-btn"
+                                                    title="Delete"
+                                                    onClick={() => handleDeleteStudent(student.matric)}
+                                                >
+                                                    🗑
                                                 </button>
 
                                             </div>
@@ -183,10 +232,15 @@ function Student(){
                                 <div className="modal-header">
 
                                     <div>
-                                        <h2>Add Student</h2>
+                                        <h2>
+                                            {editingStudent ? "Edit Student" : "Add Student"}
+                                        </h2>
 
                                         <p>
-                                            Enter the student's information below.
+                                            {editingStudent
+                                                ? "Update the student's information below."
+                                                : "Enter the student's information below."
+                                            }
                                         </p>
                                     </div>
 
@@ -311,7 +365,7 @@ function Student(){
                                             type="submit"
                                             className="save-student-btn"
                                         >
-                                            Add Student
+                                            {editingStudent ? "Save Changes" : "Add Student"}
                                         </button>
 
                                     </div>
