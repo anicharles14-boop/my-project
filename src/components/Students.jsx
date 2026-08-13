@@ -5,7 +5,7 @@ import { useState } from "react";
 
 function Student(){
 
-    const students = [
+    const [students, setStudents] = useState([
     {
       matric: "CST001",
       name: "John Doe",
@@ -36,15 +36,49 @@ function Student(){
       department: "Software Engineering",
       level: "500",
     },
-  ];
+  ]);
 
-  const [search, setSearch] = useState("");
+    const [search, setSearch] = useState("");
+    /*popup*/
+    const [showModal, setShowModal] = useState(false);
+    const [matric, setMatric] = useState("");
+    const [name, setName] = useState("");
+    const [department, setDepartment] = useState("");
+    const [level, setLevel] = useState("");
 
-  const filteredStudents = students.filter((student) =>
-    `${student.matric} ${student.name} ${student.department}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+     // Add student function
+    const handleAddStudent = (e) => {
+        e.preventDefault();
+
+        const newStudent = {
+            matric: matric,
+            name: name,
+            department: department,
+            level: level,
+        };
+
+        // Add new student to the existing students
+        setStudents((previousStudents) => [
+            ...previousStudents,
+            newStudent,
+        ]);
+
+        // Clear form
+        setMatric("");
+        setName("");
+        setDepartment("");
+        setLevel("");
+
+        // Close modal
+        setShowModal(false);
+    };
+
+
+    const filteredStudents = students.filter((student) =>
+        `${student.matric} ${student.name} ${student.department}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
 
     return(
         <div className="universal-layout">
@@ -60,7 +94,10 @@ function Student(){
                     </div>
                     
                     <div className="add-student-button">
-                        <button>+ Add Student</button>
+                        <button
+                            onClick={() => setShowModal(true)}>
+                            + Add Student
+                        </button>
                     </div>
                     
                 </div>
@@ -134,14 +171,164 @@ function Student(){
                             </table>
                         </div>
                     </div>
-                
 
-                    {/* Footer */}
-                    
+                    {showModal && (
+
+                        <div className="modal-overlay">
+
+                            <div className="student-modal">
+
+                                {/* Modal Header */}
+
+                                <div className="modal-header">
+
+                                    <div>
+                                        <h2>Add Student</h2>
+
+                                        <p>
+                                            Enter the student's information below.
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        className="close-modal"
+                                        onClick={() => setShowModal(false)}
+                                    >
+                                        ×
+                                    </button>
+
+                                </div>
+
+
+                                {/* Form */}
+
+                                <form onSubmit={handleAddStudent}>
+
+                                    <div className="form-group">
+
+                                        <label>
+                                            Matric Number
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. CST001"
+                                            value={matric}
+                                            onChange={(e) =>
+                                                setMatric(e.target.value)
+                                            }
+                                            required
+                                        />
+
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>
+                                            Full Name
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            placeholder="Enter student's full name"
+                                            value={name}
+                                            onChange={(e) =>
+                                                setName(e.target.value)
+                                            }
+                                            required
+                                        />
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>
+                                            Department
+                                        </label>
+
+                                        <select
+                                             value={department}
+                                            onChange={(e) =>
+                                                setDepartment(e.target.value)
+                                            }
+                                            required
+                                        >
+                                            <option value="">
+                                            Select department
+                                            </option>
+
+                                            <option>
+                                            Computer Science
+                                            </option>
+
+                                            <option>
+                                            Software Engineering
+                                            </option>
+
+                                            <option>
+                                            Information Technology
+                                            </option>
+                                        </select>
+
+                                    </div>
+
+
+                                    <div className="form-group">
+                                        <label>
+                                            Level
+                                        </label>
+
+                                        <select
+                                            value={level}
+                                            onChange={(e) =>
+                                                setLevel(e.target.value)
+                                            }
+                                            required
+                                        >
+
+                                            <option value="">Select level</option>
+                                            <option value="100">100</option>
+                                            <option value="200">200</option>
+                                            <option value="300">300</option>
+                                            <option value="400">400</option>
+                                            <option value="500">500</option>
+                                        </select>
+                                    </div>
+
+
+                                    {/* Buttons */}
+
+                                    <div className="modal-actions">
+
+                                        <button
+                                            type="button"
+                                            className="cancel-btn"
+                                            onClick={() => setShowModal(false)}
+                                        >
+                                            Cancel
+                                        </button>
+
+                                        <button
+                                            type="submit"
+                                            className="save-student-btn"
+                                        >
+                                            Add Student
+                                        </button>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                        )}
+                                
+
+                                    
 
                 </div>
-            </div>
-        
+            </div>        
         </div>
         
     )
