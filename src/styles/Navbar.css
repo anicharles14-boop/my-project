@@ -47,7 +47,7 @@ hr{
     min-height: 100vh;
     margin-bottom: 0px;
     width:250px;
-    position: relative;
+    position: fixed;
 
 
 }
