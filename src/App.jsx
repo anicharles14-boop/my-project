@@ -10,6 +10,10 @@ import Evaluation from './components/Evaluation';
 import Report from './components/Report';
 import Setting from './components/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
+import StudentSignup from './students/components/StudentSignup';
+import StudentDashboard from './students/components/StudentDashboard';
+import StudentProfile from './students/components/StudentProfile';
+import StudentSettings from './students/components/StudentSettings';
 
 
 
@@ -23,6 +27,22 @@ const router = createBrowserRouter([
   {
     path:"/signup",
     element:<Signup/>
+  },
+  {
+    path: "/student/signup",
+    element: <StudentSignup />
+  },
+  {
+    path: "/student/dashboard",
+    element: <StudentDashboard />
+  },
+  {
+    path: "/student/profile",
+    element: <StudentProfile />
+  },
+  {
+    path: "/student/settings",
+    element: <StudentSettings />
   },
   {
     element: <ProtectedRoute/>,

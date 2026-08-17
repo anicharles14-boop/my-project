@@ -1,0 +1,181 @@
+.evaluation-content {
+    padding: 25px 30px;
+}
+
+
+/* HEADER */
+
+.evaluation-title {
+    margin-bottom: 25px;
+}
+
+.evaluation-title h1 {
+    margin: 0 0 6px;
+
+    color: #111827;
+
+    font-size: 26px;
+}
+
+.evaluation-title p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 16px;
+}
+
+
+/* GRID */
+
+.evaluation-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 22px;
+}
+
+
+/* CARDS */
+
+.evaluation-card {
+    padding: 24px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+}
+
+.evaluation-card h2 {
+    margin: 0 0 20px;
+
+    color: #111827;
+
+    font-size: 20px;
+}
+
+
+/* LABELS */
+
+.evaluation-card label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #111827;
+
+    font-size: 16px;
+}
+/* INPUTS */
+
+.evaluation-card input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    color: #111827;
+    font-size: 14px;
+}
+
+.evaluation-card input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.08);
+}
+
+
+/* SCORE GRID */
+
+.score-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 16px;
+}
+
+
+/* BUTTON */
+
+.evaluation-card button {
+    width: 100%;
+    padding: 11px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.evaluation-card button:hover {
+    background: #4338ca;
+}
+
+
+/* RESULT */
+
+.result p {
+    margin: 16px 0 6px;
+    color: #9ca3af;
+    font-size: 17px;
+}
+
+.score {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.result hr {
+    margin: 18px 0;
+    border: none;
+    border-top: 1px solid #000000;
+}
+
+
+/* PERFORMANCE */
+
+.level {
+    display: inline-block;
+    padding: 5px 0px;
+    border-radius: 20px;
+    font-size: 15px;
+
+}
+
+/* RECOMMENDATION */
+
+.recommendation {
+    color: #374151;
+    font-size: 15px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 750px) {
+
+    .evaluation-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 500px) {
+
+    .score-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .evaluation-content {
+        padding: 20px;
+    }
+
+}
