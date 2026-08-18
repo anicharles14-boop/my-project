@@ -78,7 +78,6 @@ function Evaluation() {
 
     return (
         <div className="universal-layout">
-
             <Navbar />
 
             <div className="layout">
@@ -88,27 +87,30 @@ function Evaluation() {
                 <div className="evaluation-content">
 
                     <div className="evaluation-title">
-
                         <h1>Student Evaluation</h1>
-
                         <p>
                             Evaluate student performance using fuzzy logic.
                         </p>
-
                     </div>
 
-
                     <div className="evaluation-grid">
-
-
-                        {/* EVALUATION FORM */}
 
                         <div className="evaluation-card">
 
                             <h2>Student Evaluation</h2>
+                            
 
 
-                            <label>Student</label>
+                            <label>Student
+                                <select>
+                                    <option>COURSES</option>
+                                    <option>COS 313</option> 
+                                    <option>COS 333</option> 
+                                    <option>COS 331</option> 
+                                    <option>COS 361</option> 
+                                    <option>COS 315</option> 
+                                </select>
+                            </label>
 
                             <input
                                 value="John Doe — CST001"

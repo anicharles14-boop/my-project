@@ -1,0 +1,268 @@
+.page {
+  min-height: 100vh;
+  background: rgb(236, 237, 247);
+  
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+}
+ 
+.card {
+  width: 100%;
+  max-width: 1300px;
+  background: rgb(238, 251, 255);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0px 0px 8px rgb(224, 210, 210);
+}
+ 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px 24px;
+}
+ 
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+ 
+.brand-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #5548e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+.brand-name {
+  font-weight: bold;
+  font-size: 17px;
+  color: #14142b;
+}
+ 
+.brand-sub {
+  font-size: 13px;
+  color: #8a8aa3;
+}
+ 
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #5548e0;
+  font-size: 14px;
+  text-decoration: none;
+}
+ 
+.the-body {
+  display: flex;
+  background: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0px 0px 1px lightblue; 
+ 
+  
+}
+ 
+.left-panel {
+  flex: 1;
+  background: #f2f2fa;
+  padding: 40px;
+  background: linear-gradient(135deg, #f0f8ff 0%, #dceefe 60%, #cbe4fb 100%);
+    
+}
+ 
+.right-panel {
+  flex: 1;
+  padding: 40px;
+  
+  
+}
+ 
+.left-title {
+  font-size: 30px;
+  font-weight: bold;
+  color: #14142b;
+  margin: 0 0 14px;
+}
+ 
+.left-title-highlight {
+  color: #5548e0;
+}
+ 
+.left-subtext {
+  color: #6e6e8f;
+  font-size: 15px;
+  margin: 0 0 24px;
+}
+ 
+.image-placeholder {
+  width: 100%;
+  height: 200px;
+  background: #e7e6f7;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8a8aa3;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+.image-placeholder img{
+  width:100%;
+  background-color: blue;
+}
+ 
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+ 
+.feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+ 
+.feature-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #e4e1fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+.feature-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #14142b;
+}
+ 
+.feature-desc {
+  font-size: 13px;
+  color: #8a8aa3;
+}
+ 
+.login-here {
+  font-size: 14px;
+  color: #6e6e8f;
+}
+ 
+.login-here a {
+  color: #5548e0;
+  font-weight: bold;
+  text-decoration: none;
+}
+ 
+.form-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #14142b;
+  margin: 0 0 6px;
+}
+ 
+.form-subtext {
+  color: #8a8aa3;
+  font-size: 14px;
+  margin: 0 0 24px;
+}
+ 
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+ 
+.form-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+ 
+.form-field.full {
+  margin-bottom: 18px;
+}
+ 
+.form-field label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #14142b;
+  margin-bottom: 8px;
+}
+ 
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+ 
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: #a0a0b8;
+  display: flex;
+}
+ 
+.input-wrap input,
+.input-wrap select {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border: 1px solid #e2e2ee;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #14142b;
+}
+ 
+.toggle-visibility {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #a0a0b8;
+  cursor: pointer;
+  display: flex;
+}
+ 
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #8a8aa3;
+  margin-top: 8px;
+}
+ 
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #4a4a68;
+  margin: 4px 0 22px;
+}
+ 
+.checkbox-row a {
+  color: #5548e0;
+}
+ 
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #5548e0;
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
