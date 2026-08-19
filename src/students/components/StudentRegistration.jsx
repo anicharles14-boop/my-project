@@ -1,4 +1,4 @@
-import "../styles/StudentSignup.css";
+import "../styles/StudentRegistration.css";
 import illustration from "../../assets/student-illustration.svg"
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";

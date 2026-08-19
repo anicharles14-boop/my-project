@@ -10,10 +10,11 @@ import Evaluation from './components/Evaluation';
 import Report from './components/Report';
 import Setting from './components/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
-import StudentSignup from './students/components/StudentSignup';
+import StudentRegistration from './students/components/StudentRegistration';
 import StudentDashboard from './students/components/StudentDashboard';
 import StudentProfile from './students/components/StudentProfile';
 import StudentSettings from './students/components/StudentSettings';
+import StudentLogin from './students/components/StudentLogin';
 
 
 
@@ -29,8 +30,12 @@ const router = createBrowserRouter([
     element:<Signup/>
   },
   {
-    path: "/student/signup",
-    element: <StudentSignup />
+    path: "/student/registration",
+    element: <StudentRegistration />
+  },
+  {
+    path:"/student/login",
+    element: <StudentLogin />
   },
   {
     path: "/student/dashboard",
