@@ -2,18 +2,18 @@ import StudentNavbar from "./StudentNavbar"
 import Header from "../../components/Header"
 
 
-function StudentDashboard(){
+function StudentResult(){
     return(
         <div className="universal-layout">
             <StudentNavbar/>
             <div className="layout">
                 
                 <Header/>
-                <p>Student Dashboard</p>
+                <p>Student Result</p>
             </div>
         
         </div>
         
     )
 }
-export default StudentDashboard
+export default StudentResult

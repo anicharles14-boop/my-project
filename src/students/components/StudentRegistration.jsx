@@ -1,13 +1,14 @@
 import "../styles/StudentRegistration.css";
 import illustration from "../../assets/student-illustration.svg"
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { db, auth } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 
 
-function StudentSignup() {
+function StudentRegistration() {
 
     const [name, setName] = useState("");
     const [phone, setPhone] = useState();
@@ -119,7 +120,7 @@ function StudentSignup() {
                             </div>
                 
                             <div className="login-here">
-                                Already have an account? <a href="#">Login here</a>
+                                Already have an account? <Link to="/student/login">Login here</Link>
                             </div>
                         </div>
 
@@ -213,9 +214,9 @@ function StudentSignup() {
                                                 <option value="" disabled>
                                                 Select your department
                                                 </option>
-                                                <option value="cs">Computer Science</option>
-                                                <option value="eng">Engineering</option>
-                                                <option value="bus">Business Administration</option>
+                                                <option value="Computer Science">Computer Science</option>
+                                                <option value="Engineering">Engineering</option>
+                                                <option value="Business Administration">Business Administration</option>
                                             </select>
                                         </div>
                                     </div>
@@ -288,4 +289,4 @@ function StudentSignup() {
     )
 }
 
-export default StudentSignup;
+export default StudentRegistration;

@@ -1,69 +1,143 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "../../config/firebase";
-import { getDocs, addDoc, collection } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth } from "../../config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+
+import StudentNavbar from "./StudentNavbar";
+import Header from "../../components/Header";
+import "../styles/StudentProfile.css"
+
 
 
 
 function StudentProfile() {
-    const [details, setDetails] = useState([]);
     const [name, setName] = useState("");
-    const [phone, setPhone] = useState(0);
+    const [phone, setPhone] = useState("");
     const [matric, setMatric] = useState("");
     const [email, setEmail] = useState("");
     const [department, setDepartment] = useState("");
     const [level, setLevel] = useState("");
 
-    const studentsCollection = collection(db, "students")
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                console.log("No user is logged in");
+                return;
+            }
 
-    function displayDetails(e){
-        
-    }
-    async function getStudents(){
-        try{
-            const data = await getDocs(studentsCollection)
-            const filteredData = data.docs.map( (doc)=>({
-            ...doc.data(),
-            id:doc.id}));
-            setDetails(filteredData)
-        }catch(err){
-            console.error(err)
-        }
-        
-    }
+            try {
+                const studentsQuery = query(
+                    collection(db, "students"),
+                    where("uid", "==", user.uid)
+                );
+                const studentDetails = await getDocs(studentsQuery);
 
-    async function addStudent(){
-        try{
-            await addDoc(studentsCollection, {
-                name: name,
-                "matric number": matric,
-                phone: phone
-            })
-        }
-        catch(err){
-            console.log(err)
-        }
-    }
+                if (studentDetails.empty) {
+                    console.log("Student document does not exist");
+                    return;
+                }
+
+                const studentData = studentDetails.docs[0].data();
+
+                setName(studentData.name || "");
+                setPhone(studentData.phone || "");
+                setMatric(studentData["matric number"] || "");
+                setEmail(studentData["email address"] || "");
+                setDepartment(studentData.department || "");
+                setLevel(studentData.level || "");
+            } catch (error) {
+                console.error("Error getting student:", error);
+            }
+        });
+
+        return unsubscribe;
+    }, []);
+
+
+   
+    
     return(
         
-        <div>
-            <input onChange={(e)=>setName(e.target.value)}/>
-            <input onChange={(e)=>setMatric(e.target.value)}/>
-            <input />
-            <input type="number" onChange={(e)=>setPhone(e.target.value)}/>
-            <input />
-            <input/>
-            <button onClick={addStudent}>add student</button>
-            <br/>
-            <button onClick={getStudents}>click</button>
-            <div>
-                {details.map((detail) => (
-                    <>
-                        <div>{detail.name}</div>
-                        <div>{detail["email address"]}</div>
-                    </>
-                    
-                ))}
+        <div className="universal-layout">
+            <StudentNavbar/>
+            <div className="layout">
+                
+                <Header/>
+                <div className="student-profile-wrapper">
+                    <h1 className="student-profile-title">My Profile</h1>
+                    <p className="student-profile-subtitle">
+                        View and manage your personal information.
+                    </p>
+
+                    <div className="student-profile-header-card">
+                        <div className="student-profile-avatar">
+                            {name
+                                ? name
+                                    .split(" ")
+                                    .map(word => word.charAt(0).toUpperCase())
+                                    .join("")
+                                : "?"}
+                        </div>
+                        <div className="student-profile-header-info">
+                            <h2 className="student-profile-name">{name}</h2>
+                            <p className="student-profile-role">{department} Student</p>
+                            <p className="student-profile-matric">Matric No: {matric}</p>
+                        </div>
+                    </div>
+
+                    <div className="student-profile-info-card">
+                        <div className="student-profile-info-header">
+                            <h3 className="student-profile-info-title">Personal Information</h3>
+                        </div>
+
+                        <div className="student-profile-info-list">
+                            <div className="student-profile-info-item">
+                                <div className="student-profile-info-icon">
+                                ✉️
+                                </div>
+                                <div className="student-profile-info-content">
+                                    <span className="student-profile-info-label">Email:</span>
+                                    <span className="student-profile-info-value">
+                                        {email}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="student-profile-info-item">
+                                <div className="student-profile-info-icon">
+                                📞
+                                </div>
+                                <div className="student-profile-info-content">
+                                    <span className="student-profile-info-label">Phone:</span>
+                                    <span className="student-profile-info-value">{phone}</span>
+                                </div>
+                            </div>
+
+                            <div className="student-profile-info-item">
+                                <div className="student-profile-info-icon">
+                                🏛️
+                                </div>
+                                <div className="student-profile-info-content">
+                                    <span className="student-profile-info-label">Department:</span>
+                                    <span className="student-profile-info-value">{department}</span>
+                                </div>
+                            </div>
+
+                            <div className="student-profile-info-item">
+                                <div className="student-profile-info-icon">
+                                🎓
+                                </div>
+                                <div className="student-profile-info-content">
+                                    <span className="student-profile-info-label">Level:</span>
+                                    <span className="student-profile-info-value">{level}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+        
         </div>
     )
 }

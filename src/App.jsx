@@ -13,6 +13,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import StudentRegistration from './students/components/StudentRegistration';
 import StudentDashboard from './students/components/StudentDashboard';
 import StudentProfile from './students/components/StudentProfile';
+import StudentResult from './students/components/StudentResult';
 import StudentSettings from './students/components/StudentSettings';
 import StudentLogin from './students/components/StudentLogin';
 
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: "/student/profile",
     element: <StudentProfile />
+  },
+  {
+    path:"/student/result",
+    element:<StudentResult/>
   },
   {
     path: "/student/settings",

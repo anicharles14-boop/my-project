@@ -1,42 +1,39 @@
 import Navbar from "./Navbar";
 import Header from "./Header";
 import "../styles/Student.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { db } from "../config/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 function Student(){
 
     const [students, setStudents] = useState([
-    {
-      matric: "CST001",
-      name: "John Doe",
-      department: "Computer Science",
-      level: "300",
-    },
-    {
-      matric: "SE001",
-      name: "Jane Smith",
-      department: "Software Engineering",
-      level: "400",
-    },
-    {
-      matric: "IT001",
-      name: "Michael Paul",
-      department: "Information Technology",
-      level: "200",
-    },
-    {
-      matric: "CST002",
-      name: "Esther James",
-      department: "Computer Science",
-      level: "300",
-    },
-    {
-      matric: "SE002",
-      name: "David Okoro",
-      department: "Software Engineering",
-      level: "500",
-    },
+    
   ]);
+
+  useEffect(function () {
+    async function getStudents() {
+        try {
+            const studentCollection = collection(db, "students");
+
+            const studentSnapshot = await getDocs(studentCollection);
+
+            const studentList = studentSnapshot.docs.map(function (doc) {
+                return {
+                    id: doc.id,
+                    ...doc.data()
+                };
+            });
+
+            setStudents(studentList);
+
+        } catch (error) {
+            console.error("Error getting students:", error);
+        }
+    }
+
+    getStudents();
+}, []);
 
     const [search, setSearch] = useState("");
     /*popup*/
@@ -183,7 +180,7 @@ function Student(){
                                     {filteredStudents.map((student) => (
                                     <tr key={student.matric}>
 
-                                        <td>{student.matric}</td>
+                                        <td>{student["matric number"]}</td>
 
                                         <td>{student.name}</td>
 

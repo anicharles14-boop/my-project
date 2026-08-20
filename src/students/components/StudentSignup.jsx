@@ -213,9 +213,9 @@ function StudentSignup() {
                                                 <option value="" disabled>
                                                 Select your department
                                                 </option>
-                                                <option value="cs">Computer Science</option>
-                                                <option value="eng">Engineering</option>
-                                                <option value="bus">Business Administration</option>
+                                                <option value="Computer Science">Computer Science</option>
+                                                <option value="Engineering">Engineering</option>
+                                                <option value="Business Administration">Business Administration</option>
                                             </select>
                                         </div>
                                     </div>

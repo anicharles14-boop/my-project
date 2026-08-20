@@ -1,0 +1,202 @@
+.student-profile-wrapper {
+
+    margin: 0 auto;
+    padding: 32px 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+        Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #1a1a2e;
+    background-color: #f8f9fc;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.student-profile-title {
+font-size: 28px;
+font-weight: 700;
+margin: 0 0 4px 0;
+color: #1a1a2e;
+}
+
+.student-profile-subtitle {
+font-size: 14px;
+color: #6b7280;
+margin: 0 0 24px 0;
+}
+
+/* Header Card */
+.student-profile-header-card {
+display: flex;
+align-items: center;
+gap: 20px;
+background: #ffffff;
+border-radius: 16px;
+padding: 24px;
+margin-bottom: 20px;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.student-profile-avatar {
+width: 72px;
+height: 72px;
+border-radius: 50%;
+background-color: #8b5cf6;
+color: #ffffff;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 24px;
+font-weight: 600;
+flex-shrink: 0;
+}
+
+.student-profile-header-info {
+display: flex;
+flex-direction: column;
+gap: 2px;
+}
+
+.student-profile-name {
+font-size: 20px;
+font-weight: 700;
+margin: 0;
+color: #1a1a2e;
+}
+
+.student-profile-role {
+font-size: 14px;
+color: #4b5563;
+margin: 0;
+}
+
+.student-profile-matric {
+font-size: 14px;
+color: #4b5563;
+margin: 0;
+}
+
+.student-profile-degree {
+font-size: 14px;
+color: #7c3aed;
+font-weight: 500;
+margin: 4px 0 0 0;
+}
+
+/* Personal Information Card */
+.student-profile-info-card {
+background: #ffffff;
+border-radius: 16px;
+padding: 24px;
+box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.student-profile-info-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 20px;
+}
+
+.student-profile-info-title {
+font-size: 18px;
+font-weight: 700;
+margin: 0;
+color: #1a1a2e;
+}
+
+.student-profile-edit-btn {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+background-color: #7c3aed;
+color: #ffffff;
+border: none;
+border-radius: 9999px;
+padding: 8px 16px;
+font-size: 14px;
+font-weight: 500;
+cursor: pointer;
+transition: background-color 0.2s ease;
+}
+
+.student-profile-edit-btn:hover {
+background-color: #6d28d9;
+}
+
+.student-profile-edit-icon {
+font-size: 14px;
+}
+
+/* Info List */
+.student-profile-info-list {
+display: flex;
+flex-direction: column;
+}
+
+.student-profile-info-item {
+display: flex;
+align-items: center;
+gap: 16px;
+padding: 16px 0;
+border-bottom: 1px solid #f3f4f6;
+}
+
+.student-profile-info-item:last-child {
+border-bottom: none;
+padding-bottom: 0;
+}
+
+.student-profile-info-icon {
+width: 40px;
+height: 40px;
+border-radius: 50%;
+background-color: #f3e8ff;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+flex-shrink: 0;
+color: #7c3aed;
+}
+
+.student-profile-info-content {
+display: flex;
+align-items: center;
+gap: 8px;
+flex: 1;
+}
+
+.student-profile-info-label {
+font-size: 14px;
+font-weight: 500;
+color: #1a1a2e;
+min-width: 90px;
+}
+
+.student-profile-info-value {
+font-size: 14px;
+color: #4b5563;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+.student-profile-header-card {
+    flex-direction: column;
+    text-align: center;
+}
+
+.student-profile-info-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.student-profile-info-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.student-profile-info-label {
+    min-width: auto;
+}
+}
