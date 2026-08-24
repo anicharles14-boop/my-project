@@ -1,16 +1,19 @@
 import Navbar from "./Navbar";
 import Header from "./Header";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import "../styles/Evaluation.css";
+import { db } from "../config/firebase";
+import { collection, addDoc, query, where, getDocs, updateDoc, serverTimestamp } from "firebase/firestore";
 
 function Evaluation() {
 
-    const [scores, setScores] = useState({
-        attendance: 0,
-        assignment: 0,
-        test: 0,
-        exam: 0,
-    });
+    const location = useLocation();
+    const selectedStudent = location.state?.student;
+
+    const [selectedCourse, setSelectedCourse] = useState("");
+
+    const [scores, setScores] = useState({});
 
     const [result, setResult] = useState(null);
 
@@ -20,16 +23,27 @@ function Evaluation() {
 
         setScores({
             ...scores,
-            [name]: Math.min(100, Math.max(0, Number(value)))
+            [selectedCourse]: {
+                ...scores[selectedCourse],
+                [name]: Math.min(100, Math.max(0, Number(value)))
+            }
+            
         });
     };
 
 
+    const currentScores = {
+        attendance: scores[selectedCourse]?.attendance ?? 0,
+        assignment: scores[selectedCourse]?.assignment ?? 0,
+        test: scores[selectedCourse]?.test ?? 0,
+        exam: scores[selectedCourse]?.exam ?? 0
+    };
+
     const overallScore = Math.round(
-        scores.attendance * 0.10 +
-        scores.assignment * 0.10 +
-        scores.test * 0.20 +
-        scores.exam * 0.60
+        currentScores.attendance * 0.10 +
+        currentScores.assignment * 0.10 +
+        currentScores.test * 0.20 +
+        currentScores.exam * 0.60
     );
 
 
@@ -65,14 +79,87 @@ function Evaluation() {
     };
 
 
-    const evaluateStudent = () => {
+    const evaluateStudent = async () => {
 
         setResult({
             overall: overallScore,
             level: getPerformance(),
             recommendation: getRecommendation(),
         });
+        await saveEvaluation();
 
+    };
+
+    const saveEvaluation = async () => {
+
+        if (!selectedStudent) {
+            alert("No student selected");
+            return;
+        }
+
+        if (!selectedCourse) {
+            alert("Please select a course");
+            return;
+        }
+
+        try {
+
+            const evaluationQuery = query(
+                collection(db, "evaluations"),
+                where("studentId", "==", selectedStudent.id),
+                where("course", "==", selectedCourse)
+            );
+
+            const existingEvaluation = await getDocs(evaluationQuery);
+
+            const evaluationData = {
+                studentId: selectedStudent.id,
+                course: selectedCourse,
+
+                attendance: currentScores.attendance,
+                assignment: currentScores.assignment,
+                test: currentScores.test,
+                exam: currentScores.exam,
+
+                overall: overallScore,
+                level: getPerformance(),
+                recommendation: getRecommendation(),
+
+                updatedAt: serverTimestamp()
+            };
+
+            if (!existingEvaluation.empty) {
+
+                // Evaluation already exists → update it
+                const evaluationDoc = existingEvaluation.docs[0];
+
+                await updateDoc(
+                    evaluationDoc.ref,
+                    evaluationData
+                );
+
+                alert("Evaluation updated successfully!");
+
+            } else {
+
+                // No evaluation exists → create one
+                await addDoc(
+                    collection(db, "evaluations"),
+                    {
+                        ...evaluationData,
+                        createdAt: serverTimestamp()
+                    }
+                );
+
+                alert("Evaluation saved successfully!");
+            }
+
+        } catch (error) {
+
+            console.error("Error saving evaluation:", error);
+            alert("Failed to save evaluation");
+
+        }
     };
 
 
@@ -101,21 +188,24 @@ function Evaluation() {
                             
 
 
-                            <label>Student
-                                <select>
-                                    <option>COURSES</option>
-                                    <option>COS 313</option> 
-                                    <option>COS 333</option> 
-                                    <option>COS 331</option> 
-                                    <option>COS 361</option> 
-                                    <option>COS 315</option> 
-                                </select>
-                            </label>
+                            <p>
+                                {selectedStudent
+                                    ? `${selectedStudent.name.toUpperCase()} — ${selectedStudent["matric number"]}`
+                                    : "Select a student from the Students page"
+                                }
+                            </p>
+                            <select
+                                value={selectedCourse}
+                                onChange={(e) => setSelectedCourse(e.target.value)}
+                            >
 
-                            <input
-                                value="John Doe — CST001"
-                                
-                            />
+                                <option>COURSES</option>
+                                <option>COS 313</option> 
+                                <option>COS 333</option> 
+                                <option>COS 331</option> 
+                                <option>COS 361</option> 
+                                <option>COS 315</option> 
+                            </select>
 
 
                             <div className="score-grid">
@@ -129,7 +219,7 @@ function Evaluation() {
                                     <input
                                         type="number"
                                         name="attendance"
-                                        value={scores.attendance}
+                                        value={scores[selectedCourse]?.attendance || 0}
                                         onChange={handleChange}
                                     />
 
@@ -145,7 +235,7 @@ function Evaluation() {
                                     <input
                                         type="number"
                                         name="assignment"
-                                        value={scores.assignment}
+                                        value={scores[selectedCourse]?.assignment || 0}
                                         onChange={handleChange}
                                     />
 
@@ -161,7 +251,7 @@ function Evaluation() {
                                     <input
                                         type="number"
                                         name="test"
-                                        value={scores.test}
+                                        value={scores[selectedCourse]?.test || 0}
                                         onChange={handleChange}
                                     />
 
@@ -179,7 +269,7 @@ function Evaluation() {
                                         min="0"
                                         max="100"
                                         name="exam"
-                                        value={scores.exam}
+                                        value={scores[selectedCourse]?.exam || 0}
                                         onChange={handleChange}
                                     />
 

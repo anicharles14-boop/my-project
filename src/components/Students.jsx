@@ -2,14 +2,13 @@ import Navbar from "./Navbar";
 import Header from "./Header";
 import "../styles/Student.css";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
 function Student(){
 
-    const [students, setStudents] = useState([
-    
-  ]);
+    const [students, setStudents] = useState([  ]);
 
   useEffect(function () {
     async function getStudents() {
@@ -36,68 +35,27 @@ function Student(){
 }, []);
 
     const [search, setSearch] = useState("");
-    /*popup*/
     const [showModal, setShowModal] = useState(false);
     const [editingStudent, setEditingStudent] = useState(null);
     const [matric, setMatric] = useState("");
     const [name, setName] = useState("");
     const [department, setDepartment] = useState("");
     const [level, setLevel] = useState("");
-
-     // Add student function
-    const handleAddStudent = (e) => {
-    e.preventDefault();
-
-    const studentData = {
-        matric: matric,
-        name: name,
-        department: department,
-        level: level,
-    };
-
-    if (editingStudent) {
-
-        setStudents((previousStudents) =>
-            previousStudents.map((student) =>
-                student.matric === editingStudent.matric
-                    ? studentData
-                    : student
-            )
-        );
-
-    } else {
-
-        setStudents((previousStudents) => [
-            ...previousStudents,
-            studentData,
-        ]);
-
-    }
-
-    setMatric("");
-    setName("");
-    setDepartment("");
-    setLevel("");
-
-    setEditingStudent(null);
-    setShowModal(false);
-    };
+    const navigate = useNavigate();
 
     const handleEditStudent = (student) => {
-        setEditingStudent(student);
-
-        setMatric(student.matric);
-        setName(student.name);
-        setDepartment(student.department);
-        setLevel(student.level);
-
-        setShowModal(true);
+        navigate("/evaluation", { 
+            state: { 
+                student 
+            } 
+        });
     };
 
-    const handleDeleteStudent = (matric) => {
+
+    const handleDeleteStudent = (id) => {
         setStudents((previousStudents) =>
             previousStudents.filter(
-                (student) => student.matric !== matric
+                (student) => student.id !== id
             )
         );
     };
@@ -202,7 +160,7 @@ function Student(){
                                                 <button
                                                     className="delete-btn"
                                                     title="Delete"
-                                                    onClick={() => handleDeleteStudent(student.matric)}
+                                                    onClick={() => handleDeleteStudent(student.id)}
                                                 >
                                                     🗑
                                                 </button>
