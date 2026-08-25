@@ -86,6 +86,7 @@ hr{
     width: 25px;
     position: absolute;
     left:15px;
+    top:12px;
     filter: brightness(0) saturate(100%) invert(87%) sepia(8%) saturate(160%) hue-rotate(180deg) brightness(91%) contrast(90%);
 }
 .navbar-elements div:hover{
