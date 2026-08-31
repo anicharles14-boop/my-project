@@ -61,12 +61,6 @@ function StudentNavbar(){
                     </div>
                 </Link>
                 
-                <Link to="/report" className="link">
-                    <div className="report">
-                        <img src={report}/>
-                        Reports
-                    </div>
-                </Link>
                 
                 <Link to="/setting" className="link">
                     <div className="setting">

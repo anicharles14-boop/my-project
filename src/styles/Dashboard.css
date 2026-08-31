@@ -85,6 +85,8 @@
 .recent-evaluations {
     background: white;
     border-radius: 12px;
+    max-height: 400px;
+    overflow:auto;
 }
 /* HEADER */
 .recent-header {

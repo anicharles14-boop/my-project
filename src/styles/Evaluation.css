@@ -72,8 +72,17 @@
     font-size: 16px;
 }
 .evaluation-card select{
-    background-color: rgb(255, 255, 255);
-    
+    width: 48%;
+    padding: 10px 40px 10px 14px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+
 }
 /* INPUTS */
 

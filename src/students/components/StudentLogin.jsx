@@ -27,7 +27,7 @@ function StudentLogin() {
                 email,
                 password
             );
-            navigate("/student/profile");
+            navigate("/student/dashboard");
         } catch (err) {
             console.error("Login failed:", err);
         }
@@ -51,7 +51,7 @@ function StudentLogin() {
                         Email Address<br />
                         <input
                             type="email"
-                            placeholder="admin@gmail.com"
+                            placeholder="student@gmail.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required

@@ -6,7 +6,17 @@ import { useNavigate } from "react-router-dom";
 import { db, auth } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-
+import shieldHalf from "../../assets/shield-half.svg";
+import studentEvaluation from "../../assets/student-evaluation.svg";
+import chart from "../../assets/chart.svg";
+import studentIllustration from "../../assets/student-illustration.png";
+import arrowBack from "../../assets/arrow-back.svg";
+import userName from "../../assets/user-name.svg";
+import phoneIcon from "../../assets/phone-icon.svg";
+import matricIcon from "../../assets/matric-icon.svg";
+import emails from "../../assets/emails.svg";
+import lock from "../../assets/lock.svg";
+import eye from "../../assets/eye.svg";
 
 function StudentRegistration() {
 
@@ -41,7 +51,7 @@ function StudentRegistration() {
                 level: level
                 
             })
-            navigate("/student/profile");
+            navigate("/student/dashboard");
         }
         catch(err){
             console.log(err)
@@ -55,7 +65,7 @@ function StudentRegistration() {
                     <div className="header">
                         <div className="brand">
                         <div className="brand-icon">
-                            yes
+                            <img src={shieldHalf}/>
                         </div>
                         <div>
                             <div className="brand-name">UniEval</div>
@@ -63,7 +73,7 @@ function StudentRegistration() {
                         </div>
                         </div>
                         <a href="#" className="back-link">
-                        yes
+                        <img src={arrowBack}/>
                         Back to Login
                         </a>
                     </div>
@@ -80,13 +90,13 @@ function StudentRegistration() {
                             </p>
                 
                             <div className="image-placeholder">
-                                something here 
+                                <img src={studentIllustration}/> 
                             </div>
                 
                             <div className="features">
                                 <div className="feature">
                                 <div className="feature-icon">
-                                    yes
+                                    <img src={chart}/>
                                 </div>
                                 <div>
                                     <div className="feature-title">Track Your Performance</div>
@@ -97,7 +107,7 @@ function StudentRegistration() {
                                 </div>
                                 <div className="feature">
                                     <div className="feature-icon">
-                                        yes
+                                        <img src={studentEvaluation}/>
                                     </div>
                                     <div>
                                         <div className="feature-title">View Evaluations</div>
@@ -138,7 +148,7 @@ function StudentRegistration() {
                                         <label>Full Name</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                yes
+                                                <img src={userName}/>
                                             </span>
                                             <input
                                                 type="text"
@@ -154,7 +164,7 @@ function StudentRegistration() {
                                         <label>Matric Number</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                yes
+                                                <img src={matricIcon}/>
                                             </span>
                                             <input
                                                 type="text"
@@ -172,7 +182,7 @@ function StudentRegistration() {
                                         <label>Email Address</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                yed
+                                                <img src={emails}/>
                                             </span>
                                             <input
                                                 type="email"
@@ -188,7 +198,7 @@ function StudentRegistration() {
                                         <label>Phone Number</label>
                                         <div className="input-wrap">
                                         <span className="input-icon">
-                                            yes
+                                            <img src={phoneIcon}/>
                                         </span>
                                         <input
                                             type="tel"
@@ -245,7 +255,7 @@ function StudentRegistration() {
                                     <label>Password</label>
                                     <div className="input-wrap">
                                         <span className="input-icon">
-                                        yes
+                                        <img src={lock}/>
                                         </span>
                                         <input
                                             type="password"
@@ -258,7 +268,7 @@ function StudentRegistration() {
                                         type="button"
                                         className="toggle-visibility"
                                         >
-                                        something light 
+                                        <img src={eye}/> 
                                         </button>
                                     </div>
                                     

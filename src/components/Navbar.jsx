@@ -61,12 +61,7 @@ function Navbar(){
                     </div>
                 </Link>
                 
-                <Link to="/report" className="link">
-                    <div className="report">
-                        <img src={report}/>
-                        Reports
-                    </div>
-                </Link>
+                
                 
                 <Link to="/setting" className="link">
                     <div className="setting">
@@ -75,8 +70,8 @@ function Navbar(){
                     </div>
                 </Link>
                 
-                <Link className="link" onClick={handleLogout}>
-                    <div className="navbar-logout">
+                <Link className="link navbar-logout" onClick={handleLogout}>
+                    <div >
                         <img src={logout}/>
                         
                         Logout

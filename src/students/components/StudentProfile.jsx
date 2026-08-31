@@ -6,7 +6,11 @@ import { onAuthStateChanged } from "firebase/auth";
 
 import StudentNavbar from "./StudentNavbar";
 import Header from "../../components/Header";
-import "../styles/StudentProfile.css"
+import "../styles/StudentProfile.css";
+import messageIcon from "../../assets/emails.svg";
+import phoneIcon from "../../assets/phone-icon.svg";
+import departmentIcon from "../../assets/department-icon.svg";
+import graduationIcon from "../../assets/graduation-icon.svg";
 
 
 
@@ -94,7 +98,7 @@ function StudentProfile() {
                         <div className="student-profile-info-list">
                             <div className="student-profile-info-item">
                                 <div className="student-profile-info-icon">
-                                ✉️
+                                    ✉️
                                 </div>
                                 <div className="student-profile-info-content">
                                     <span className="student-profile-info-label">Email:</span>
@@ -106,7 +110,7 @@ function StudentProfile() {
 
                             <div className="student-profile-info-item">
                                 <div className="student-profile-info-icon">
-                                📞
+                                    📞
                                 </div>
                                 <div className="student-profile-info-content">
                                     <span className="student-profile-info-label">Phone:</span>
@@ -116,7 +120,7 @@ function StudentProfile() {
 
                             <div className="student-profile-info-item">
                                 <div className="student-profile-info-icon">
-                                🏛️
+                                    🏛️
                                 </div>
                                 <div className="student-profile-info-content">
                                     <span className="student-profile-info-label">Department:</span>
@@ -126,7 +130,7 @@ function StudentProfile() {
 
                             <div className="student-profile-info-item">
                                 <div className="student-profile-info-icon">
-                                🎓
+                                    🎓
                                 </div>
                                 <div className="student-profile-info-content">
                                     <span className="student-profile-info-label">Level:</span>

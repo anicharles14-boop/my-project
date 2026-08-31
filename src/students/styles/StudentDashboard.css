@@ -1,0 +1,201 @@
+.dash-dashboard {
+  
+  margin: 0 auto;
+  padding: 24px;
+  width: 100%;
+}
+
+/* Header */
+.dash-welcome-header {
+  background: linear-gradient(110deg, #2867df, #347df0);
+    border-radius: 13px;
+    padding: 25px;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.dash-welcome-header h1 {
+  font-size: 25px;
+  font-weight: 700;
+  margin-bottom: 0;
+  text-transform: capitalize;
+}
+
+.dash-welcome-header p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin: 5px 0px;
+}
+
+/* Stats cards */
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.dash-stat-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dash-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e7ff;
+  
+}
+.dash-stat-icon img{
+  width: 25px;
+}
+
+.dash-stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.dash-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Main content */
+.dash-main-content {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+}
+
+.dash-courses-panel,
+.dash-timetable-panel {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.dash-courses-panel h2,
+.dash-timetable-panel h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: #111827;
+}
+
+/* Courses table */
+.dash-table-wrapper {
+  overflow-x: auto;
+}
+
+.dash-table-wrapper table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dash-table-wrapper thead th {
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6b7280;
+  padding: 12px 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dash-table-wrapper tbody td {
+  font-size: 0.9rem;
+  padding: 14px 8px;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+
+.dash-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Timetable */
+.dash-timetable-list {
+  padding-left: 0px;
+  
+}
+.dash-timetable-panel h2{
+  border-bottom: 1px solid rgb(221, 216, 216);
+  padding-bottom: 12px;
+  margin-bottom: 0;
+  
+}
+
+.dash-timetable-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 0;
+  padding-top: ;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dash-timetable-item:last-child {
+  border-bottom: none;
+}
+
+.dash-timetable-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dash-timetable-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #111827;
+  
+}
+
+.dash-timetable-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.dash-timetable-time {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dash-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-main-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dash-dashboard {
+    padding: 16px;
+  }
+
+  .dash-welcome-header {
+    padding: 20px;
+  }
+
+  .dash-welcome-header h1 {
+    font-size: 1.4rem;
+  }

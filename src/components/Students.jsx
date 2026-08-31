@@ -4,7 +4,7 @@ import "../styles/Student.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 
 function Student(){
 
@@ -35,12 +35,6 @@ function Student(){
 }, []);
 
     const [search, setSearch] = useState("");
-    const [showModal, setShowModal] = useState(false);
-    const [editingStudent, setEditingStudent] = useState(null);
-    const [matric, setMatric] = useState("");
-    const [name, setName] = useState("");
-    const [department, setDepartment] = useState("");
-    const [level, setLevel] = useState("");
     const navigate = useNavigate();
 
     const handleEditStudent = (student) => {
@@ -52,13 +46,19 @@ function Student(){
     };
 
 
-    const handleDeleteStudent = (id) => {
-        setStudents((previousStudents) =>
-            previousStudents.filter(
-                (student) => student.id !== id
-            )
+    const handleDeleteStudent = async (studentId) => {
+    try {
+        await deleteDoc(doc(db, "students", studentId));
+
+        // Remove the student from the screen immediately
+        setStudents((prevStudents) =>
+            prevStudents.filter((student) => student.id !== studentId)
         );
-    };
+
+    } catch (error) {
+        console.error("Error deleting student:", error);
+    }
+};
 
 
 
@@ -81,21 +81,6 @@ function Student(){
                         <h2>Students</h2>
                         <p>Manage and view all registered students</p>
                     </div>
-                    
-                    <div className="add-student-button">
-                        <button
-                            onClick={() => {
-                                setEditingStudent(null);
-                                setMatric("");
-                                setName("");
-                                setDepartment("");
-                                setLevel("");
-                                setShowModal(true);
-                            }}>
-                            + Add Student
-                        </button>
-                    </div>
-                    
                 </div>
 
                 <div className="universal-student-table-container">
@@ -176,162 +161,7 @@ function Student(){
                         </div>
                     </div>
 
-                    {showModal && (
 
-                        <div className="modal-overlay">
-
-                            <div className="student-modal">
-
-                                {/* Modal Header */}
-
-                                <div className="modal-header">
-
-                                    <div>
-                                        <h2>
-                                            {editingStudent ? "Edit Student" : "Add Student"}
-                                        </h2>
-
-                                        <p>
-                                            {editingStudent
-                                                ? "Update the student's information below."
-                                                : "Enter the student's information below."
-                                            }
-                                        </p>
-                                    </div>
-
-                                    <button
-                                        className="close-modal"
-                                        onClick={() => setShowModal(false)}
-                                    >
-                                        ×
-                                    </button>
-
-                                </div>
-
-
-                                {/* Form */}
-
-                                <form onSubmit={handleAddStudent}>
-
-                                    <div className="form-group">
-
-                                        <label>
-                                            Matric Number
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. CST001"
-                                            value={matric}
-                                            onChange={(e) =>
-                                                setMatric(e.target.value)
-                                            }
-                                            required
-                                        />
-
-                                    </div>
-
-
-                                    <div className="form-group">
-                                        <label>
-                                            Full Name
-                                        </label>
-
-                                        <input
-                                            type="text"
-                                            placeholder="Enter student's full name"
-                                            value={name}
-                                            onChange={(e) =>
-                                                setName(e.target.value)
-                                            }
-                                            required
-                                        />
-                                    </div>
-
-
-                                    <div className="form-group">
-                                        <label>
-                                            Department
-                                        </label>
-
-                                        <select
-                                             value={department}
-                                            onChange={(e) =>
-                                                setDepartment(e.target.value)
-                                            }
-                                            required
-                                        >
-                                            <option value="">
-                                            Select department
-                                            </option>
-
-                                            <option>
-                                            Computer Science
-                                            </option>
-
-                                            <option>
-                                            Software Engineering
-                                            </option>
-
-                                            <option>
-                                            Information Technology
-                                            </option>
-                                        </select>
-
-                                    </div>
-
-
-                                    <div className="form-group">
-                                        <label>
-                                            Level
-                                        </label>
-
-                                        <select
-                                            value={level}
-                                            onChange={(e) =>
-                                                setLevel(e.target.value)
-                                            }
-                                            required
-                                        >
-
-                                            <option value="">Select level</option>
-                                            <option value="100">100</option>
-                                            <option value="200">200</option>
-                                            <option value="300">300</option>
-                                            <option value="400">400</option>
-                                            <option value="500">500</option>
-                                        </select>
-                                    </div>
-
-
-                                    {/* Buttons */}
-
-                                    <div className="modal-actions">
-
-                                        <button
-                                            type="button"
-                                            className="cancel-btn"
-                                            onClick={() => setShowModal(false)}
-                                        >
-                                            Cancel
-                                        </button>
-
-                                        <button
-                                            type="submit"
-                                            className="save-student-btn"
-                                        >
-                                            {editingStudent ? "Save Changes" : "Add Student"}
-                                        </button>
-
-                                    </div>
-
-                                </form>
-
-                            </div>
-
-                        </div>
-
-                        )}
                                 
 
                                     

@@ -114,14 +114,13 @@ h1{
 }
 .line hr {
     flex: 1;
-    border-top: 1px solid #d1d5db;
+    border-top: 1px solid black;
     
 }
 .line span {
     margin: 0 12px;
     color: #61656e;
     font-size: 13px;
-    background: white;
     font-family: sans-serif;
 }
 .signin p{

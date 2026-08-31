@@ -142,9 +142,7 @@ function StudentResult(){
         circumference * (1 - overallScore / 100);
 
 
-    if (loading) {
-        return <p>Loading results...</p>;
-    }
+    
     return(
         <div className="universal-layout">
             <StudentNavbar/>
@@ -167,7 +165,7 @@ function StudentResult(){
           <div className="result-stat-cards">
             <div className="result-stat-card">
               <div className="result-stat-icon">
-                <IconBox />
+                
               </div>
               <div>
                 <div className="result-stat-label">Total Courses</div>
@@ -177,7 +175,7 @@ function StudentResult(){
 
             <div className="result-stat-card">
               <div className="result-stat-icon">
-                <IconBox />
+                
               </div>
               <div>
                 <div className="result-stat-label">GPA</div>
@@ -187,7 +185,7 @@ function StudentResult(){
 
             <div className="result-stat-card">
               <div className="result-stat-icon ">
-                <IconBox />
+                
               </div>
               <div>
                 <div className="result-stat-label">Highest Grade</div>
@@ -251,7 +249,7 @@ function StudentResult(){
                 onClick={() => setSelectedCourse(courses[0])}
                 aria-label="Close"
               >
-                <IconBox size="tiny" />
+                
               </button>
             </div>
 
@@ -280,7 +278,7 @@ function StudentResult(){
 
               <div className="result-performance-badge-wrap">
                 <span className="result-performance-badge">
-                  <IconBox size="tiny" />
+                  
                   {selectedCourse?.level}
                 </span>
               </div>
@@ -343,7 +341,7 @@ function StudentResult(){
                 
                 <div className="result-meta-row">
                   <span className="result-meta-row-label">
-                    <IconBox />
+                    
                     Evaluation Date
                   </span>
                   <span className="result-meta-row-value">
@@ -355,11 +353,11 @@ function StudentResult(){
                 </div>
                 <div className="result-meta-row">
                   <span className="result-meta-row-label">
-                    <IconBox />
+                    
                     Status
                   </span>
                   <span className="result-meta-row-status">
-                    <IconBox size="tiny" />
+                    
                     Completed
                   </span>
                 </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs,query, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs,query, orderBy } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Navbar from "./Navbar";
 import Header from "./Header";
@@ -12,6 +12,7 @@ function Dashboard(){
     const [averageScore, setAverageScore] = useState(0);
     const [highestScore, setHighestScore] = useState(0);
     const [recentEvaluations, setRecentEvaluations] = useState([]);
+    const [showAllEvaluations, setShowAllEvaluations] = useState(false);
 
     useEffect(() => {
 
@@ -58,8 +59,7 @@ function Dashboard(){
 
             const evaluationQuery = query(
                 collection(db, "evaluations"),
-                orderBy("createdAt", "desc"),
-                limit(5)
+                orderBy("createdAt", "desc")
             );
 
             const recentSnapshot = await getDocs(evaluationQuery);
@@ -175,7 +175,9 @@ function Dashboard(){
                     <div className="recent-evaluations">
                         <div className="recent-header">
                             <h2>Recent Evaluations</h2>
-                            <button>View all</button>
+                            <button onClick={() => setShowAllEvaluations(!showAllEvaluations)}>
+                                {showAllEvaluations ? "Show recent" : "View all"}
+                            </button>
                         </div>
 
                         <div className="evaluation-table-wrapper">
@@ -192,7 +194,10 @@ function Dashboard(){
                                 </thead>
 
                                 <tbody>
-                                    {recentEvaluations.map((evaluation) => (
+                                    {(showAllEvaluations
+                                    ? recentEvaluations
+                                    : recentEvaluations.slice(0, 5)
+                                    ).map((evaluation) => (
                                         <tr key={evaluation.id}>
 
                                             <td>{evaluation.name}</td>
