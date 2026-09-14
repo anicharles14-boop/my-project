@@ -72,10 +72,10 @@ function StudentRegistration() {
                             <div className="brand-sub">Performance System</div>
                         </div>
                         </div>
-                        <a href="#" className="back-link">
+                        <Link to="/student/login" className="back-link">
                         <img src={arrowBack}/>
                         Back to Login
-                        </a>
+                        </Link>
                     </div>
             
                     <div className="the-body">
@@ -225,8 +225,8 @@ function StudentRegistration() {
                                                 Select your department
                                                 </option>
                                                 <option value="Computer Science">Computer Science</option>
-                                                <option value="Engineering">Engineering</option>
-                                                <option value="Business Administration">Business Administration</option>
+                                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                                <option value="Law">Law</option>
                                             </select>
                                         </div>
                                     </div>
@@ -273,7 +273,7 @@ function StudentRegistration() {
                                     </div>
                                     
                                     <div className="hint">
-                                        Password must be at least 8 characters long
+                                        Password must be at least 6 characters long
                                     </div>
                                 </div>
                 

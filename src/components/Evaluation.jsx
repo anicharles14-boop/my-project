@@ -1,10 +1,11 @@
 import Navbar from "./Navbar";
 import Header from "./Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import "../styles/Evaluation.css";
 import { db } from "../config/firebase";
 import { collection, addDoc, query, where, getDocs, updateDoc, serverTimestamp } from "firebase/firestore";
+import coursesData from "../data/courses";
 
 function Evaluation() {
 
@@ -12,11 +13,22 @@ function Evaluation() {
     const selectedStudent = location.state?.student;
 
     const [selectedCourse, setSelectedCourse] = useState("");
-
     const [scores, setScores] = useState({});
-
     const [result, setResult] = useState(null);
 
+    const availableCourses = selectedStudent
+        ? coursesData.filter(
+            (course) =>
+                course.department === selectedStudent.department &&
+                course.level === String(selectedStudent.level)
+        )
+        : [];
+
+    useEffect(() => {
+        setSelectedCourse("");
+        setScores({});
+        setResult(null);
+    }, [selectedStudent?.id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -197,14 +209,20 @@ function Evaluation() {
                             <select
                                 value={selectedCourse}
                                 onChange={(e) => setSelectedCourse(e.target.value)}
+                                disabled={!selectedStudent || availableCourses.length === 0}
                             >
-
-                                <option>COURSES</option>
-                                <option>COS 313</option> 
-                                <option>COS 333</option> 
-                                <option>COS 331</option> 
-                                <option>COS 361</option> 
-                                <option>COS 315</option> 
+                                <option value="">
+                                    {selectedStudent
+                                        ? availableCourses.length
+                                            ? "COURSES"
+                                            : "No courses for this department/level"
+                                        : "Select a student first"}
+                                </option>
+                                {availableCourses.map((course) => (
+                                    <option key={`${course.code}-${course.department}-${course.level}`} value={course.code}>
+                                        {course.code}
+                                    </option>
+                                ))}
                             </select>
 
 

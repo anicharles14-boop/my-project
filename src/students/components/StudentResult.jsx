@@ -5,17 +5,16 @@ import "../styles/StudentResult.css";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../../config/firebase";
+import coursesData from "../../data/courses";
 
 const IconBox = ({ size = "" }) => (
   <span className={`result-icon-box ${size ? `result-${size}` : ""}`}></span>
 );
-const courseNames = {
-    "COS 313": "Data Structures",
-    "COS 333": "Operating Systems",
-    "COS 331": "Computer Programming",
-    "COS 361": "Computer Networks",
-    "COS 315": "Software Engineering"
-};
+
+const courseMap = Object.fromEntries(
+    coursesData.map((course) => [course.code, course])
+);
+
 const getGrade = (score) => {
     if (score >= 70) return "A";
     if (score >= 60) return "B";
@@ -25,13 +24,7 @@ const getGrade = (score) => {
 
     return "F";
 };
-const courseUnits = {
-    "COS 313": 3,
-    "COS 333": 3,
-    "COS 331": 2,
-    "COS 361": 2,
-    "COS 315": 2
-};
+
 const gradePoints = {
     A: 5,
     B: 4,
@@ -39,6 +32,24 @@ const gradePoints = {
     D: 2,
     E: 1,
     F: 0
+};
+
+const getGradeBasedGpa = (coursesList) => {
+    const totalQualityPoints = coursesList.reduce((total, course) => {
+        const grade = getGrade(course.overall);
+        const point = gradePoints[grade] || 0;
+        const unit = courseMap[course.course]?.credit || 0;
+
+        return total + (point * unit);
+    }, 0);
+
+    const totalUnits = coursesList.reduce((total, course) => {
+        return total + (courseMap[course.course]?.credit || 0);
+    }, 0);
+
+    if (totalUnits === 0) return "0.00";
+
+    return (totalQualityPoints / totalUnits).toFixed(2);
 };
 
 
@@ -113,25 +124,7 @@ function StudentResult(){
     }, []);
 
 
-    const totalQualityPoints = courses.reduce((total, course) => {
-
-        const grade = getGrade(course.overall);
-        const point = gradePoints[grade];
-        const unit = courseUnits[course.course];
-
-        return total + (point * unit);
-
-    }, 0);
-
-    const totalUnits = courses.reduce((total, course) => {
-
-        return total + (courseUnits[course.course] || 0);
-
-    }, 0);
-
-    const gpa = totalUnits > 0
-        ? (totalQualityPoints / totalUnits).toFixed(2)
-        : "0.00";
+    const gpa = getGradeBasedGpa(courses);
 
     // Overall score of selected course
     const overallScore = selectedCourse?.overall ?? 0;
@@ -206,29 +199,33 @@ function StudentResult(){
                 </tr>
               </thead>
               <tbody>
-                {courses.map((course) => (
-                    <tr
-                        key={course.id}
-                        onClick={() => setSelectedCourse(course)}
-                        className={
-                            "result-course-row" +
-                            (selectedCourse?.id === course.id
-                                ? " result-selected"
-                                : "")
-                        }
-                    >
-                    <td>
-                      <span className="result-course-code">{course.course}</span>
-                    </td>
-                    <td>{courseNames[course.course]}</td>
-                    <td>{course.overall}%</td>
-                    <td>
-                      <span className={`result-grade-badge result-grade-${course.grade}`}>
-                        {getGrade(course.overall)}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {courses.map((course) => {
+                    const courseInfo = courseMap[course.course] || { name: course.course, credit: 0 };
+
+                    return (
+                        <tr
+                            key={course.id}
+                            onClick={() => setSelectedCourse(course)}
+                            className={
+                                "result-course-row" +
+                                (selectedCourse?.id === course.id
+                                    ? " result-selected"
+                                    : "")
+                            }
+                        >
+                            <td>
+                              <span className="result-course-code">{course.course}</span>
+                            </td>
+                            <td>{courseInfo.name}</td>
+                            <td>{course.overall}%</td>
+                            <td>
+                              <span className={`result-grade-badge result-grade-${getGrade(course.overall)}`}>
+                                {getGrade(course.overall)}
+                              </span>
+                            </td>
+                        </tr>
+                    );
+                })}
               </tbody>
             </table>
           </div>

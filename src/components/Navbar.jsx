@@ -17,7 +17,7 @@ function Navbar(){
     async function handleLogout(){
         try{
             await signOut(auth);
-            navigate("/")
+            navigate("/student/login");
         }
         catch(error){
             console.log(error)

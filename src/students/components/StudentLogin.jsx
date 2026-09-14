@@ -79,7 +79,7 @@ function StudentLogin() {
 
                         <p>
                             Dont have an account? {""}
-                            <Link to="/student/registration">Register</Link>
+                            <Link to="/">Register</Link>
                         </p>
                     </div>
                 </form>

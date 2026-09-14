@@ -2,19 +2,20 @@ import { useState, useEffect } from "react";
 import StudentNavbar from "./StudentNavbar"
 import Header from "../../components/Header";
 import "../styles/StudentDashboard.css";
-import { collection, getDocs, onSnapshot, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import attendanceIcon from "../../assets/attendance-icon.svg";
 import bookIcon from "../../assets/book-icon.svg";
 import averageIcon from "../../assets/average-icon.svg";
+import coursesData from "../../data/courses";
 
 
 function StudentDashboard(){
     const [studentName, setStudentName] = useState("");
     const [averageScore, setAverageScore] = useState(0);
     const [averageAttendance, setAverageAttendance] = useState(0);
-    
+    const [studentCourses, setStudentCourses] = useState([]);
 
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -22,6 +23,7 @@ function StudentDashboard(){
             setStudentName("");
             setAverageScore(0);
             setAverageAttendance(0);
+            setStudentCourses([]);
             return;
         }
 
@@ -37,13 +39,24 @@ function StudentDashboard(){
             if (studentSnapshot.empty) {
                 setStudentName("");
                 setAverageScore(0);
+                setAverageAttendance(0);
+                setStudentCourses([]);
                 return;
             }
             
             const studentDoc = studentSnapshot.docs[0];
+            const studentData = studentDoc.data();
             const studentId = studentDoc.id;
-            setStudentName(studentDoc.data().name);
-            // Now query evaluations using the correct studentId
+            const department = studentData.department || "";
+            const level = studentData.level || "";
+
+            setStudentName(studentData.name || "");
+
+            const matchedCourses = coursesData.filter(
+                (course) => course.department === department && course.level === level
+            );
+            setStudentCourses(matchedCourses);
+
             const evaluationQuery = query(
                 collection(db, "evaluations"),
                 where("studentId", "==", studentId)
@@ -67,8 +80,6 @@ function StudentDashboard(){
             const average = total / evaluationSnapshot.docs.length;
 
             setAverageScore(average);
-            //Attendance
-
             const attendanceTotal = evaluationSnapshot.docs.reduce(
               (sum, doc) => {
                   return sum + Number(doc.data().attendance || 0);
@@ -86,16 +97,6 @@ function StudentDashboard(){
 
     return () => unsubscribe();
 }, []);
-
-    
-    const courses = [
-        { code: 'COS 313', name: 'Data Structures', credit: 3, lecturer: 'Dr. A. Johnson' },
-        { code: 'COS 333', name: 'Operating Systems', credit: 3, lecturer: 'Prof. M. Khan' },
-        { code: 'COS 331', name: 'Computer Programming', credit: 2, lecturer: 'Dr. L. Carter' },
-        { code: 'COS 361', name: 'Computer Networks', credit: 2, lecturer: 'Prof. S. Patel' },
-        { code: 'COS 315', name: 'Software Engineering', credit: 2, lecturer: 'Dr. T. Williams' },
-        
-    ];
 
   const timetable = [
         { title: 'Data Structures', subtitle: 'Lecture • Room 204', time: '9:00 AM' },
@@ -143,7 +144,7 @@ function StudentDashboard(){
           </div>
           <div className="dash-stat-content">
             <span className="dash-stat-label">Courses enrolled</span>
-            <span className="dash-stat-value">5</span>
+            <span className="dash-stat-value">{studentCourses.length}</span>
           </div>
         </div>
       </div>
@@ -162,14 +163,20 @@ function StudentDashboard(){
                 </tr>
               </thead>
               <tbody>
-                {courses.map((course) => (
-                  <tr key={course.code}>
+                {studentCourses.length > 0 ? studentCourses.map((course) => (
+                  <tr key={`${course.code}-${course.department}-${course.level}`}>
                     <td>{course.code}</td>
                     <td>{course.name}</td>
                     <td>{course.credit}</td>
                     <td>{course.lecturer}</td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: "center" }}>
+                      No courses found for this department and level.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
