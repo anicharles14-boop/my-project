@@ -266,7 +266,10 @@
   color: #4a4a68;
   margin: 4px 0 22px;
 }
- 
+
+.checkbox-row input{
+  margin-top: 0px;
+}
 .checkbox-row a {
   color: #5548e0;
 }

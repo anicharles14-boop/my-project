@@ -84,6 +84,31 @@
     outline: none;
 
 }
+.course-student {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+.course-student button {
+    border:none;
+    background-color: white;
+    font-size: 13px;
+    padding:0px;
+
+}
+.course-student .link {
+    width: 48%;
+    padding: 10px 0px 10px 0px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #333;
+    font-family: inherit;
+    cursor: pointer;
+    outline: none;
+    text-align: center;
+
+}
 /* INPUTS */
 
 .evaluation-card input {
@@ -114,7 +139,7 @@
 
 /* BUTTON */
 
-.evaluation-card button {
+.evaluate-student-btn {
     width: 100%;
     padding: 11px;
     margin-top: 10px;
@@ -127,7 +152,7 @@
     transition: 0.2s;
 }
 
-.evaluation-card button:hover {
+.evaluate-student-btn:hover {
     background: #4338ca;
 }
 

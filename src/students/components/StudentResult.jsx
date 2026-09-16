@@ -2,10 +2,14 @@ import StudentNavbar from "./StudentNavbar"
 import Header from "../../components/Header"
 import { useState, useEffect } from "react";
 import "../styles/StudentResult.css";
+import totalCourseIcon from "../../assets/total-course-icon.svg";
+import gpaIcon from "../../assets/gpa-icon.svg";
+import performanceIcon from "../../assets/performance-icon.svg";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, auth } from "../../config/firebase";
 import coursesData from "../../data/courses";
+import { downloadResultPDF } from "../utils/downloadResultPDF";
 
 const IconBox = ({ size = "" }) => (
   <span className={`result-icon-box ${size ? `result-${size}` : ""}`}></span>
@@ -54,10 +58,35 @@ const getGradeBasedGpa = (coursesList) => {
 
 
 
+const getPerformanceLevel = (gpaValue) => {
+    const score = Number(gpaValue) || 0;
+
+    if (score >= 4.5) return "Excellent";
+    if (score >= 4.0) return "Very Good";
+    if (score >= 3.0) return "Good";
+
+    return "Poor";
+};
+
+const getPerformanceClass = (gpaValue) => {
+    const level = getPerformanceLevel(gpaValue);
+
+    if (level === "Excellent") return "performance-excellent";
+    if (level === "Very Good") return "performance-very-good";
+    if (level === "Good") return "performance-good";
+
+    return "performance-poor";
+};
+
 function StudentResult(){
     const [courses, setCourses] = useState([]);
     const [selectedCourse, setSelectedCourse] = useState(null);
-    const [studentName, setStudentName] = useState("");
+    const [student, setStudent] = useState({
+        name: "",
+        department: "",
+        level: "",
+        matricNumber: "",
+    });
     const [loading, setLoading] = useState(true);
 
     
@@ -88,7 +117,13 @@ function StudentResult(){
                 }
 
                 const studentDoc = studentSnapshot.docs[0];
-                setStudentName(studentDoc.data().name);
+                const studentData = studentDoc.data();
+                setStudent({
+                    name: studentData.name || "",
+                    department: studentData.department || "",
+                    level: studentData.level || "",
+                    matricNumber: studentData["matric number"] || "",
+                });
 
                 // Find evaluations belonging to this student
                 const evaluationQuery = query(
@@ -134,241 +169,209 @@ function StudentResult(){
     const dashOffset =
         circumference * (1 - overallScore / 100);
 
-
-    
-    return(
+    return (
         <div className="universal-layout">
-            <StudentNavbar/>
+            <StudentNavbar />
             <div className="layout">
-                
-                <Header/>
+                <Header />
+
                 <div className="result-dashboard">
-  
-      
+                    <div className="result-grid">
+                        <div>
+                            <h2 className="result-student-name">{student.name.toUpperCase()}</h2>
+                            <p className="result-student-subtitle">
+                                Here's a complete overview of your academic results 
+                            </p>
 
-      <div className="result-grid">
-        {/* Left / main column */}
-        <div>
-          <h2 className="result-student-name">{studentName.toUpperCase()}</h2>
-          <p className="result-student-subtitle">
-            Here's a complete overview of your academic results across all courses this semester.
-          </p>
+                            <div className="result-stat-cards">
+                                <div className="result-stat-card">
+                                    <div className="result-stat-icon">
+										<img src={totalCourseIcon}/>
+									</div>
+                                    <div>
+                                        <div className="result-stat-label">Total Courses</div>
+                                        <div className="result-stat-value">{courses.length}</div>
+                                    </div>
+                                </div>
 
-          {/* Stat cards */}
-          <div className="result-stat-cards">
-            <div className="result-stat-card">
-              <div className="result-stat-icon">
-                
-              </div>
-              <div>
-                <div className="result-stat-label">Total Courses</div>
-                <div className="result-stat-value">{courses.length}</div>
-              </div>
-            </div>
+                                <div className="result-stat-card">
+                                    <div className="result-stat-icon">
+										<img src={gpaIcon}/>
+									</div>
+                                    <div>
+                                        <div className="result-stat-label">GPA</div>
+                                        <div className="result-stat-value">{gpa}</div>
+                                    </div>
+                                </div>
 
-            <div className="result-stat-card">
-              <div className="result-stat-icon">
-                
-              </div>
-              <div>
-                <div className="result-stat-label">GPA</div>
-                <div className="result-stat-value">{gpa}</div>
-              </div>
-            </div>
+                                <div className="result-stat-card">
+                                    <div className="result-stat-icon">
+										<img src={performanceIcon}/>
+									</div>
+                                    <div>
+                                        <div className="result-stat-label">Performance Level</div>
+                                        <span className={`result-stat-value ${getPerformanceClass(gpa)}`}>
+                                            {getPerformanceLevel(gpa)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
 
-            <div className="result-stat-card">
-              <div className="result-stat-icon ">
-                
-              </div>
-              <div>
-                <div className="result-stat-label">Highest Grade</div>
-                <span className="result-grade-badge result-grade-A">A</span>
-              </div>
-            </div>
-          </div>
+                            <div className="result-table-card">
+                                <table className="result-course-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Course Code</th>
+                                            <th>Course Name</th>
+                                            <th>Score</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {courses.map((course) => {
+                                            const courseInfo = courseMap[course.course] || {
+                                                name: course.course,
+                                                credit: 0,
+                                            };
 
-          {/* Courses table */}
-          <div className="result-table-card">
-            <table className="result-course-table">
-              <thead>
-                <tr>
-                  <th>Course Code</th>
-                  <th>Course Name</th>
-                  <th>Score</th>
-                  <th>Grade</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map((course) => {
-                    const courseInfo = courseMap[course.course] || { name: course.course, credit: 0 };
+                                            return (
+                                                <tr
+                                                    key={course.id}
+                                                    onClick={() => setSelectedCourse(course)}
+                                                    className={
+                                                        "result-course-row" +
+                                                        (selectedCourse?.id === course.id ? " result-selected" : "")
+                                                    }
+                                                >
+                                                    <td>
+                                                        <span className="result-course-code">{course.course}</span>
+                                                    </td>
+                                                    <td>{courseInfo.name}</td>
+                                                    <td>{course.overall}%</td>
+                                                    <td>
+                                                        <span
+                                                            className={`result-grade-badge result-grade-${getGrade(course.overall)}`}
+                                                        >
+                                                            {getGrade(course.overall)}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
 
-                    return (
-                        <tr
-                            key={course.id}
-                            onClick={() => setSelectedCourse(course)}
-                            className={
-                                "result-course-row" +
-                                (selectedCourse?.id === course.id
-                                    ? " result-selected"
-                                    : "")
-                            }
-                        >
-                            <td>
-                              <span className="result-course-code">{course.course}</span>
-                            </td>
-                            <td>{courseInfo.name}</td>
-                            <td>{course.overall}%</td>
-                            <td>
-                              <span className={`result-grade-badge result-grade-${getGrade(course.overall)}`}>
-                                {getGrade(course.overall)}
-                              </span>
-                            </td>
-                        </tr>
-                    );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                            <div className="download-result-div">
+                                <button
+                                    onClick={() => downloadResultPDF({ student, courses })}
+                                    className="download-result-btn"
+                                >
+                                    Download Result
+                                </button>
+                            </div>
+                        </div>
 
-        {/* Right column */}
-        <div>
-          <div className="result-panel-card">
-            <div className="result-panel-header">
-              <div>
-                <div className="result-panel-header-title">
-                  {selectedCourse?.course}
+                        <div>
+                            <div className="result-panel-card">
+                                <div className="result-panel-header">
+                                    <div>
+                                        <div className="result-panel-header-title">{selectedCourse?.course}</div>
+                                        <div className="result-panel-header-subtitle">Selected Course</div>
+                                    </div>
+                                    <button
+                                        className="result-panel-close"
+                                        onClick={() => setSelectedCourse(courses[0])}
+                                        aria-label="Close"
+                                    ></button>
+                                </div>
+
+                                <div className="result-panel-body">
+                                    <div className="result-panel-section-label">Overall Score</div>
+
+                                    <div className="result-score-ring-wrap">
+                                        <div className="result-score-ring">
+                                            <svg viewBox="0 0 120 120">
+                                                <circle
+                                                    cx="60"
+                                                    cy="60"
+                                                    r="54"
+                                                    fill="none"
+                                                    stroke="#e5e7eb"
+                                                    strokeWidth="10"
+                                                />
+                                                <circle
+                                                    cx="60"
+                                                    cy="60"
+                                                    r="54"
+                                                    fill="none"
+                                                    stroke="#7c3aed"
+                                                    strokeWidth="10"
+                                                    strokeLinecap="round"
+                                                    strokeDasharray={circumference}
+                                                    strokeDashoffset={dashOffset}
+                                                />
+                                            </svg>
+                                            <div className="result-score-ring-value">{overallScore}%</div>
+                                        </div>
+                                    </div>
+
+                                    
+
+                                    <div className="result-panel-section-label">Evaluation Components</div>
+                                    <div className="result-eval-list">
+                                        {[
+                                            {
+                                                label: "Attendance (%)",
+                                                value: selectedCourse?.attendance ?? 0,
+                                            },
+                                            {
+                                                label: "Assignment Score (%)",
+                                                value: selectedCourse?.assignment ?? 0,
+                                            },
+                                            {
+                                                label: "Test Score (%)",
+                                                value: selectedCourse?.test ?? 0,
+                                            },
+                                            {
+                                                label: "Exam Score (%)",
+                                                value: selectedCourse?.exam ?? 0,
+                                            },
+                                        ].map((item) => (
+                                            <div className="result-eval-item" key={item.label}>
+                                                <div className="result-eval-item-top">
+                                                    <span className="result-eval-item-label">{item.label}</span>
+                                                    <span className="result-eval-item-value">{item.value}%</span>
+                                                </div>
+
+                                                <div className="result-eval-bar-track">
+                                                    <div
+                                                        className="result-eval-bar-fill"
+                                                        style={{ width: `${item.value}%` }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="result-meta-list">
+                                        <div className="result-meta-row">
+                                            <span className="result-meta-row-label">Evaluation Date</span>
+                                            <span className="result-meta-row-value">
+                                                {selectedCourse?.createdAt
+                                                    ? selectedCourse.createdAt.toDate().toLocaleDateString()
+                                                    : "N/A"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="result-panel-header-subtitle">Selected Course</div>
-              </div>
-              <button
-                className="result-panel-close"
-                onClick={() => setSelectedCourse(courses[0])}
-                aria-label="Close"
-              >
-                
-              </button>
             </div>
-
-            <div className="result-panel-body">
-              <div className="result-panel-section-label">Overall Score</div>
-
-              <div className="result-score-ring-wrap">
-                <div className="result-score-ring">
-                  <svg viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" strokeWidth="10" />
-                    <circle
-                      cx="60"
-                      cy="60"
-                      r="54"
-                      fill="none"
-                      stroke="#7c3aed"
-                      strokeWidth="10"
-                      strokeLinecap="round"
-                      strokeDasharray={circumference}
-                      strokeDashoffset={dashOffset}
-                    />
-                  </svg>
-                  <div className="result-score-ring-value">{overallScore}%</div>
-                </div>
-              </div>
-
-              <div className="result-performance-badge-wrap">
-                <span className="result-performance-badge">
-                  
-                  {selectedCourse?.level}
-                </span>
-              </div>
-
-              <div className="result-panel-section-label">Evaluation Components</div>
-              <div className="result-eval-list">
-                {[
-        {
-            label: "Attendance (%)",
-            value: selectedCourse?.attendance ?? 0
-        },
-        {
-            label: "Assignment Score (%)",
-            value: selectedCourse?.assignment ?? 0
-        },
-        {
-            label: "Test Score (%)",
-            value: selectedCourse?.test ?? 0
-        },
-        {
-            label: "Exam Score (%)",
-            value: selectedCourse?.exam ?? 0
-        }
-    ].map((item) => (
-
-        <div
-            className="result-eval-item"
-            key={item.label}
-        >
-
-            <div className="result-eval-item-top">
-
-                <span className="result-eval-item-label">
-                    {item.label}
-                </span>
-
-                <span className="result-eval-item-value">
-                    {item.value}%
-                </span>
-
-            </div>
-
-            <div className="result-eval-bar-track">
-
-                <div
-                    className="result-eval-bar-fill"
-                    style={{
-                        width: `${item.value}%`
-                    }}
-                ></div>
-
-            </div>
-
         </div>
-
-    ))}
-              </div>
-
-              <div className="result-meta-list">
-                
-                <div className="result-meta-row">
-                  <span className="result-meta-row-label">
-                    
-                    Evaluation Date
-                  </span>
-                  <span className="result-meta-row-value">
-                    {selectedCourse?.createdAt
-                        ? selectedCourse.createdAt.toDate().toLocaleDateString()
-                        : "N/A"
-                    }
-                </span>
-                </div>
-                <div className="result-meta-row">
-                  <span className="result-meta-row-label">
-                    
-                    Status
-                  </span>
-                  <span className="result-meta-row-status">
-                    
-                    Completed
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-            </div>
-        
-        </div>
-        
-    )
+    );
 }
-export default StudentResult
+
+export default StudentResult;

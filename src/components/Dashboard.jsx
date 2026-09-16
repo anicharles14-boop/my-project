@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs,query, orderBy } from "firebase/firestore";
 import { db } from "../config/firebase";
+import studentIcon from "../assets/student.svg";
+import evaluationIcon from "../assets/evaluation.svg";
+import averageIcon from "../assets/average-score-icon.svg";
+import highestIcon from "../assets/highest-icon.svg";
 import Navbar from "./Navbar";
 import Header from "./Header";
 import "../styles/Dashboard.css"
@@ -30,9 +34,12 @@ function Dashboard(){
             const evaluationSnapshot = await getDocs(
                 collection(db, "evaluations")
             );
-            setTotalEvaluations(evaluationSnapshot.size);
+            const validEvaluationDocs = evaluationSnapshot.docs.filter(
+                (evaluationDoc) => students[evaluationDoc.data().studentId]
+            );
+            setTotalEvaluations(validEvaluationDocs.length);
 
-            const scores = evaluationSnapshot.docs.map(
+            const scores = validEvaluationDocs.map(
             (doc) => doc.data().overall
             );
 
@@ -64,7 +71,9 @@ function Dashboard(){
 
             const recentSnapshot = await getDocs(evaluationQuery);
 
-            setRecentEvaluations(recentSnapshot.docs.map((doc) => {
+            setRecentEvaluations(recentSnapshot.docs
+                .filter((doc) => students[doc.data().studentId])
+                .map((doc) => {
 
                 const evaluation = doc.data();
                 const student = students[evaluation.studentId];
@@ -76,8 +85,8 @@ function Dashboard(){
                     course: evaluation.course
                 };
 
-            })
-    );
+                })
+            );
 
         };
 
@@ -124,7 +133,9 @@ function Dashboard(){
                     <div className="dashboard-stats">
                         {/* TOTAL STUDENTS */}
                         <div className="dashboard-stat-card">
-                            <div className="dashboard-stat-icon"></div>
+                            <div className="dashboard-stat-icon">
+                                <img src={studentIcon}/>
+                            </div>
 
                             <div className="dashboard-stat-info">
                                 <p> Total Students </p>
@@ -139,7 +150,9 @@ function Dashboard(){
                         {/* TOTAL EVALUATIONS */}
 
                         <div className="dashboard-stat-card">
-                            <div className="dashboard-stat-icon"></div>
+                            <div className="dashboard-stat-icon">
+                                <img src={evaluationIcon}/>
+                            </div>
                             <div className="dashboard-stat-info">
                                 <p> Total Evaluations</p>
                                 <h2>{totalEvaluations}</h2>
@@ -150,7 +163,9 @@ function Dashboard(){
                         {/* AVERAGE SCORE */}
 
                         <div className="dashboard-stat-card">
-                            <div className="dashboard-stat-icon"></div>
+                            <div className="dashboard-stat-icon">
+                                <img src={averageIcon}/>
+                            </div>
                             <div className="dashboard-stat-info">
                                 <p> Average Score</p>
                                 <h2>{averageScore.toFixed(1)}%</h2>
@@ -161,7 +176,9 @@ function Dashboard(){
 
                         {/* STUDENTS AT RISK */}
                         <div className="dashboard-stat-card">
-                            <div className="dashboard-stat-icon"></div>
+                            <div className="dashboard-stat-icon">
+                                <img src={highestIcon}/>
+                            </div>
                             <div className="dashboard-stat-info">
                                 <p>Highest score</p>
                                 <h2>{highestScore}</h2>

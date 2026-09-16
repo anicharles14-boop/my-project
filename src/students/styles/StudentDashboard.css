@@ -83,16 +83,14 @@
   gap: 24px;
 }
 
-.dash-courses-panel,
-.dash-timetable-panel {
+.dash-courses-panel{
   background: #ffffff;
   border-radius: 14px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.dash-courses-panel h2,
-.dash-timetable-panel h2 {
+.dash-courses-panel h2{
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 18px;
@@ -129,51 +127,53 @@
   border-bottom: none;
 }
 
-/* Timetable */
-.dash-timetable-list {
-  padding-left: 0px;
-  
+/* Quick links */
+.quick-links {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.06);
 }
-.dash-timetable-panel h2{
+.quick-links .the-link{
+  text-decoration: none;
+}
+.quick-links h2{
   border-bottom: 1px solid rgb(221, 216, 216);
   padding-bottom: 12px;
-  margin-bottom: 0;
+  margin-bottom: 30px;
   
 }
-
-.dash-timetable-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 14px 0;
-  padding-top: ;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.dash-timetable-item:last-child {
-  border-bottom: none;
-}
-
-.dash-timetable-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.dash-timetable-title {
+.quick-links div,
+.download-transcript-button{
+  border:none;
+  box-shadow: 0px 1px 3px rgb(190, 163, 163);
+  margin-bottom: 10px;
+  border-radius: 15px;
+  padding: 10px;
   font-size: 16px;
   font-weight: bold;
-  color: #111827;
-  
+  font-family: inherit;
+  color:rgb(19, 18, 18);
+  line-height: 1.2;
+}
+.quick-links div:hover,
+.download-transcript-button:hover{
+  transition: all 0.2s ease-in-out;
+  transform: translateY(-1px);
+  background-color:rgb(247, 243, 243)
+}
+.quick-links p{
+  margin-bottom:0;
+  margin-top: 0px;
+  font-size: 11px;
+  color:rgb(133, 130, 130)
 }
 
-.dash-timetable-subtitle {
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.dash-timetable-time {
-  font-size: 14px;
-  color: #4b5563;
+.download-transcript-button {
+  width: 100%;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
 }
 
 /* Responsive */
@@ -199,3 +199,4 @@
   .dash-welcome-header h1 {
     font-size: 1.4rem;
   }
+}

@@ -2,6 +2,7 @@ import Navbar from "./Navbar";
 import Header from "./Header";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "../styles/Evaluation.css";
 import { db } from "../config/firebase";
 import { collection, addDoc, query, where, getDocs, updateDoc, serverTimestamp } from "firebase/firestore";
@@ -188,7 +189,7 @@ function Evaluation() {
                     <div className="evaluation-title">
                         <h1>Student Evaluation</h1>
                         <p>
-                            Evaluate student performance using fuzzy logic.
+                            Evaluate student performance 
                         </p>
                     </div>
 
@@ -206,24 +207,32 @@ function Evaluation() {
                                     : "Select a student from the Students page"
                                 }
                             </p>
-                            <select
-                                value={selectedCourse}
-                                onChange={(e) => setSelectedCourse(e.target.value)}
-                                disabled={!selectedStudent || availableCourses.length === 0}
-                            >
-                                <option value="">
-                                    {selectedStudent
-                                        ? availableCourses.length
-                                            ? "COURSES"
-                                            : "No courses for this department/level"
-                                        : "Select a student first"}
-                                </option>
-                                {availableCourses.map((course) => (
-                                    <option key={`${course.code}-${course.department}-${course.level}`} value={course.code}>
-                                        {course.code}
+
+                            <div className= "course-student">
+                                <select
+                                    value={selectedCourse}
+                                    onChange={(e) => setSelectedCourse(e.target.value)}
+                                    disabled={!selectedStudent || availableCourses.length === 0}
+                                >
+                                    <option value="">
+                                        {selectedStudent
+                                            ? availableCourses.length
+                                                ? "COURSES"
+                                                : "No courses for this department/level"
+                                            : "Select a student first"}
                                     </option>
-                                ))}
-                            </select>
+                                    {availableCourses.map((course) => (
+                                        <option key={`${course.code}-${course.department}-${course.level}`} value={course.code}>
+                                            {course.code}
+                                        </option>
+                                    ))}
+                                </select>
+                                <Link to="/student" className="link">
+                                    <button>GO TO STUDENTS</button>
+                                </Link>
+                                
+                            </div>
+                            
 
 
                             <div className="score-grid">
@@ -296,7 +305,7 @@ function Evaluation() {
                             </div>
 
 
-                            <button onClick={evaluateStudent}>
+                            <button className="evaluate-student-btn" onClick={evaluateStudent}>
                                 Evaluate Student
                             </button>
 

@@ -35,6 +35,8 @@ function Student(){
 }, []);
 
     const [search, setSearch] = useState("");
+    const [departmentFilter, setDepartmentFilter] = useState("");
+    const [levelFilter, setLevelFilter] = useState("");
     const navigate = useNavigate();
 
     const handleEditStudent = (student) => {
@@ -48,9 +50,31 @@ function Student(){
 
     const handleDeleteStudent = async (studentId) => {
     try {
+        const studentsSnapshot = await getDocs(collection(db, "students"));
+        const remainingStudentIds = new Set(
+            studentsSnapshot.docs
+                .map((studentDoc) => studentDoc.id)
+                .filter((id) => id !== studentId)
+        );
+
+        const evaluationsSnapshot = await getDocs(collection(db, "evaluations"));
+        const evaluationsToDelete = evaluationsSnapshot.docs.filter((evaluationDoc) => {
+            const studentReference = evaluationDoc.data().studentId;
+            const evaluationStudentId = typeof studentReference === "string"
+                ? studentReference
+                : studentReference?.id || studentReference?.path?.replace("students/", "");
+
+            return !remainingStudentIds.has(evaluationStudentId);
+        });
+
+        await Promise.all(
+            evaluationsToDelete.map((evaluationDoc) =>
+                deleteDoc(doc(db, "evaluations", evaluationDoc.id))
+            )
+        );
+
         await deleteDoc(doc(db, "students", studentId));
 
-        // Remove the student from the screen immediately
         setStudents((prevStudents) =>
             prevStudents.filter((student) => student.id !== studentId)
         );
@@ -63,11 +87,18 @@ function Student(){
 
 
 
-    const filteredStudents = students.filter((student) =>
-        `${student.matric} ${student.name} ${student.department}`
-        .toLowerCase()
-        .includes(search.toLowerCase())
-    );
+    const departments = [...new Set(students.map((student) => student.department).filter(Boolean))].sort();
+    const levels = [...new Set(students.map((student) => student.level).filter(Boolean))].sort();
+
+    const filteredStudents = students.filter((student) => {
+        const matchesSearch = `${student.matric} ${student["matric number"]} ${student.name} ${student.department}`
+            .toLowerCase()
+            .includes(search.toLowerCase());
+        const matchesDepartment = !departmentFilter || student.department === departmentFilter;
+        const matchesLevel = !levelFilter || String(student.level) === levelFilter;
+
+        return matchesSearch && matchesDepartment && matchesLevel;
+    });
 
     return(
         <div className="universal-layout">
@@ -100,9 +131,29 @@ function Student(){
                             />
                             </div>
 
-                            <button className="filter-btn">
-                            ⚑
-                            </button>
+                            <select
+                                className="student-filter"
+                                value={departmentFilter}
+                                onChange={(e) => setDepartmentFilter(e.target.value)}
+                                aria-label="Filter by department"
+                            >
+                                <option value="">All departments</option>
+                                {departments.map((department) => (
+                                    <option key={department} value={department}>{department}</option>
+                                ))}
+                            </select>
+
+                            <select
+                                className="student-filter"
+                                value={levelFilter}
+                                onChange={(e) => setLevelFilter(e.target.value)}
+                                aria-label="Filter by level"
+                            >
+                                <option value="">All levels</option>
+                                {levels.map((level) => (
+                                    <option key={level} value={level}>{level}</option>
+                                ))}
+                            </select>
                         </div>
 
                         {/* Table */}

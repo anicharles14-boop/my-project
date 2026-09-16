@@ -280,7 +280,7 @@ function StudentRegistration() {
                                 
                 
                                 <label className="checkbox-row">
-                                    <input type="checkbox" />
+                                    <input type="checkbox" required/>
                                     <span>
                                         I agree to the <a href="#">Terms of Service</a> and{" "}
                                         <a href="#">Privacy Policy</a>

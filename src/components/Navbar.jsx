@@ -1,5 +1,5 @@
 import "../styles/Navbar.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../config/firebase";
 import dashboard from "../assets/dashboard.svg";
@@ -40,35 +40,35 @@ function Navbar(){
             </div>
             <hr></hr>
             <div className="navbar-elements">
-                <Link to="/dashboard" className="link">
+                <NavLink to="/dashboard" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="dashboard" >
                         <img src={dashboard}/>
                         Dashboard
                     </div>
-                </Link>
+                </NavLink>
                 
-                <Link to="/student"className="link">
+                <NavLink to="/student" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="student">
                         <img src={student}/>
                         Students
                     </div>
-                </Link>
+                </NavLink>
                 
-                <Link to="/evaluation" className="link">
+                <NavLink to="/evaluation" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="evaluation">
                         <img src={evaluation}/>
                         Evaluation
                     </div>
-                </Link>
+                </NavLink>
                 
                 
                 
-                <Link to="/setting" className="link">
+                <NavLink to="/setting" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="setting">
                         <img src={setting}/>
                         Settings
                     </div>
-                </Link>
+                </NavLink>
                 
                 <Link className="link navbar-logout" onClick={handleLogout}>
                     <div >

@@ -15,4 +15,18 @@ body{
   flex-direction: column;
   flex: 1;
   margin-left: 250px;
+  animation: page-enter 300ms ease-in both;
 }
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+

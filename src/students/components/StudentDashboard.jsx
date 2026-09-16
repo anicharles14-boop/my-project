@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import StudentNavbar from "./StudentNavbar"
 import Header from "../../components/Header";
 import "../styles/StudentDashboard.css";
+import {Link} from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -9,6 +10,8 @@ import attendanceIcon from "../../assets/attendance-icon.svg";
 import bookIcon from "../../assets/book-icon.svg";
 import averageIcon from "../../assets/average-icon.svg";
 import coursesData from "../../data/courses";
+import { downloadResultPDF } from "../utils/downloadResultPDF";
+
 
 
 function StudentDashboard(){
@@ -16,6 +19,13 @@ function StudentDashboard(){
     const [averageScore, setAverageScore] = useState(0);
     const [averageAttendance, setAverageAttendance] = useState(0);
     const [studentCourses, setStudentCourses] = useState([]);
+    const [student, setStudent] = useState({
+      name: "",
+      department: "",
+      level: "",
+      matricNumber: "",
+    });
+    const [evaluations, setEvaluations] = useState([]);
 
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -24,6 +34,8 @@ function StudentDashboard(){
             setAverageScore(0);
             setAverageAttendance(0);
             setStudentCourses([]);
+            setStudent({ name: "", department: "", level: "", matricNumber: "" });
+            setEvaluations([]);
             return;
         }
 
@@ -41,6 +53,8 @@ function StudentDashboard(){
                 setAverageScore(0);
                 setAverageAttendance(0);
                 setStudentCourses([]);
+                setStudent({ name: "", department: "", level: "", matricNumber: "" });
+                setEvaluations([]);
                 return;
             }
             
@@ -51,6 +65,12 @@ function StudentDashboard(){
             const level = studentData.level || "";
 
             setStudentName(studentData.name || "");
+            setStudent({
+              name: studentData.name || "",
+              department,
+              level,
+              matricNumber: studentData["matric number"] || "",
+            });
 
             const matchedCourses = coursesData.filter(
                 (course) => course.department === department && course.level === level
@@ -63,6 +83,11 @@ function StudentDashboard(){
             );
             
             const evaluationSnapshot = await getDocs(evaluationQuery);
+            const evaluationData = evaluationSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            setEvaluations(evaluationData);
             
             if (evaluationSnapshot.empty) {
                 setAverageScore(0);
@@ -98,12 +123,7 @@ function StudentDashboard(){
     return () => unsubscribe();
 }, []);
 
-  const timetable = [
-        { title: 'Data Structures', subtitle: 'Lecture • Room 204', time: '9:00 AM' },
-        { title: 'Computer Programming', subtitle: 'Lab • Room 102', time: '11:00 AM' },
-        { title: 'Operating Systems', subtitle: 'Lecture • Room 315', time: '2:00 PM' },
-        
-    ];
+  
 
     return(
         <div className="universal-layout">
@@ -114,7 +134,7 @@ function StudentDashboard(){
                 <div className="dash-dashboard">
       <header className="dash-welcome-header">
         <h1>Welcome back, {studentName.split(" ")[0]}</h1>
-        <p>Fall semester, week 9</p>
+        <p>Stay on top of your academic journey and keep working toward your goals </p>
       </header>
 
       <div className="dash-stats">
@@ -182,19 +202,26 @@ function StudentDashboard(){
           </div>
         </div>
 
-        <div className="dash-timetable-panel">
-          <h2>Today's Timetable</h2>
-          <ul className="dash-timetable-list">
-            {timetable.map((item, index) => (
-              <li key={index} className="dash-timetable-item">
-                <div className="dash-timetable-info">
-                  <span className="dash-timetable-title">{item.title}</span>
-                  <span className="dash-timetable-subtitle">{item.subtitle}</span>
-                </div>
-                <span className="dash-timetable-time">{item.time}</span>
-              </li>
-            ))}
-          </ul>
+        <div className="quick-links">
+			<h2>Quick Links</h2>
+			<Link to="/student/result" className="the-link">
+				<div className="view-result">
+					View My Results
+					<p>Check your academic results</p>
+				</div>
+			</Link>
+			
+			
+        <button
+          type="button"
+          className="download-transcript-button"
+          onClick={() => downloadResultPDF({ student, courses: evaluations })}
+        >
+				Download Transcript
+				<p>Download your academic transcript</p>
+        </button>
+			
+        
         </div>
       </div>
     </div>

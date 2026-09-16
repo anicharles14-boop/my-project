@@ -5,5 +5,31 @@
     box-shadow: 0px 1px 4px lightblue;
     display: flex;
     align-items: center;
+    font-size: 27px;
+    gap:20px;
+    
+}
+.header-container img{
+    width: 23px;
+    height: 22px;
+}
+.header-container p{
+    font-family: inherit;
     font-size: 23px;
+    font-weight: 600;
+}
+.header-container button{
+    color:none;
+    background:#f3e8ff;
+    border:none;
+    border-radius:5px;
+    padding: 3px 8px 3px 8px;
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .header-container button {
+        display: block;
+        
+    }
 }

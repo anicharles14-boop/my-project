@@ -108,6 +108,24 @@
   background: #f8fafc;
 }
 
+.student-filter {
+  height: 42px;
+  min-width: 150px;
+  padding: 0 12px;
+  border: 1px solid #dfe4ea;
+  border-radius: 5px;
+  background: white;
+  color: #475569;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+}
+
+.student-filter:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.12);
+}
+
 /* Table  */
 
 .table-wrapper {
@@ -224,7 +242,7 @@
 
 .delete-btn {
   background: #fff1f2;
-  color: #black;
+  color: black;
 }
 
 .delete-btn:hover {
