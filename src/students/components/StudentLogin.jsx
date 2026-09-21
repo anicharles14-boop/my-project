@@ -6,30 +6,51 @@ import emails from "../../assets/emails.svg";
 import lock from "../../assets/lock.svg";
 import eye from "../../assets/eye.svg";
 import signupLock from "../../assets/signinLock.svg";
-import { auth} from "../../config/firebase";
+import { studentAuth, db } from "../../config/firebase";
 
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 function StudentLogin() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
+
+    const ensureStudentAccess = async (uid) => {
+        const studentQuery = query(
+            collection(db, "students"),
+            where("uid", "==", uid)
+        );
+
+        const studentSnapshot = await getDocs(studentQuery);
+
+        if (studentSnapshot.empty) {
+            await signOut(studentAuth);
+            throw new Error("This account does not have student access.");
+        }
+    };
 
     const signin = async (e) => {
 
         e.preventDefault();
+        setErrorMessage("");
 
         try {
-            await signInWithEmailAndPassword(
-                auth,
+            const userCredential = await signInWithEmailAndPassword(
+                studentAuth,
                 email,
                 password
             );
+
+            await ensureStudentAccess(userCredential.user.uid);
             navigate("/student/dashboard");
         } catch (err) {
             console.error("Login failed:", err);
+            setErrorMessage("Username or password is incorrect");
         }
     };
     
@@ -45,7 +66,9 @@ function StudentLogin() {
                     <div className="ep-input-signup">
                         <img src={emails} className="email" alt="email icon" />
                         <img src={lock} className="lock" alt="lock icon" />
-                        <img src={eye} className="eye-signup" alt="eye icon" />
+                        <img src={eye} className="eye-signup" alt="eye icon"
+                        onClick={() => setShowPassword(!showPassword)}
+                         />
 
                         <label>
                         Email Address<br />
@@ -61,12 +84,17 @@ function StudentLogin() {
                         <label>
                         Password<br />
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                        {errorMessage && (
+                            <div className="error-message" style={{ color: "red", marginTop: "0px", fontSize: "13px", lineHeight: "1.2" }}>
+                                {errorMessage}
+                            </div>
+                        )}
                         </label>
                     
                     </div>
@@ -79,7 +107,7 @@ function StudentLogin() {
 
                         <p>
                             Dont have an account? {""}
-                            <Link to="/">Register</Link>
+                            <Link to="/student/registration">Register</Link>
                         </p>
                     </div>
                 </form>

@@ -7,12 +7,14 @@ import emails from "../assets/emails.svg";
 import lock from "../assets/lock.svg";
 import eye from "../assets/eye.svg";
 import signupLock from "../assets/signinLock.svg";
-import { auth } from "../config/firebase";
+import { adminAuth, db } from "../config/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { addDoc, collection } from "firebase/firestore";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate()
 
@@ -22,8 +24,20 @@ function Signup() {
     // no confirm-password check
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard")
+      const userCredential = await createUserWithEmailAndPassword(
+        adminAuth,
+        email,
+        password
+      );
+
+      await addDoc(collection(db, "admins"), {
+        uid: userCredential.user.uid,
+        email,
+        role: "admin",
+        createdAt: new Date().toISOString(),
+      });
+
+      navigate("/admin/dashboard")
 
     } catch (err) {
       console.error(err);
@@ -41,7 +55,8 @@ function Signup() {
           <div className="ep-input-signup">
             <img src={emails} className="email" alt="email icon" />
             <img src={lock} className="lock" alt="lock icon" />
-            <img src={eye} className="eye-signup" alt="eye icon" />
+            <img src={eye} className="eye-signup" alt="eye icon"
+             onClick={() => setShowPassword(!showPassword)}/>
 
             <label>
               Email Address<br />
@@ -57,7 +72,8 @@ function Signup() {
             <label>
               Password<br />
               <input
-                type="password"
+                className="signup-password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -75,7 +91,7 @@ function Signup() {
 
             <p>
                 Already have an account?
-                <Link to="/">Log in</Link>
+                <Link to="/admin/login">Log in</Link>
             </p>
           </div>
         </form>

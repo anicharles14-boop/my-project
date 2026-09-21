@@ -12,6 +12,8 @@
 .header-container img{
     width: 23px;
     height: 22px;
+    
+    
 }
 .header-container p{
     font-family: inherit;
@@ -20,11 +22,15 @@
 }
 .header-container button{
     color:none;
-    background:#f3e8ff;
+    background:none;
     border:none;
-    border-radius:5px;
-    padding: 3px 8px 3px 8px;
+    border-radius:50%;
     display: none;
+    padding:5px 7px
+}
+.header-container button:hover{
+    background:rgb(238, 238, 238);
+    cursor:pointer;
 }
 
 @media (max-width: 700px) {

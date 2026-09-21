@@ -1,7 +1,7 @@
 import "../styles/Navbar.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { adminAuth } from "../config/firebase";
 import dashboard from "../assets/dashboard.svg";
 import shieldHalf from "../assets/shield-half.svg";
 import student from "../assets/student.svg";
@@ -14,10 +14,10 @@ function Navbar(){
     
     const navigate = useNavigate();
 
-    async function handleLogout(){
+    async function handleLogoutAdmin(){
         try{
-            await signOut(auth);
-            navigate("/student/login");
+            await signOut(adminAuth);
+            navigate("/admin/login");
         }
         catch(error){
             console.log(error)
@@ -40,21 +40,21 @@ function Navbar(){
             </div>
             <hr></hr>
             <div className="navbar-elements">
-                <NavLink to="/dashboard" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
+                <NavLink to="/admin/dashboard" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="dashboard" >
                         <img src={dashboard}/>
                         Dashboard
                     </div>
                 </NavLink>
                 
-                <NavLink to="/student" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
+                <NavLink to="/admin/student" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="student">
                         <img src={student}/>
                         Students
                     </div>
                 </NavLink>
                 
-                <NavLink to="/evaluation" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
+                <NavLink to="/admin/evaluation" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="evaluation">
                         <img src={evaluation}/>
                         Evaluation
@@ -70,7 +70,7 @@ function Navbar(){
                     </div>
                 </NavLink>
                 
-                <Link className="link navbar-logout" onClick={handleLogout}>
+                <Link className="link navbar-logout" onClick={handleLogoutAdmin}>
                     <div >
                         <img src={logout}/>
                         

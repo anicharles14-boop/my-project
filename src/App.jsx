@@ -1,13 +1,9 @@
-import { useState } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Login from './components/Login';
-import Navbar from './components/Navbar';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
-import Header from './components/Header';
 import Student from './components/Students';
 import Evaluation from './components/Evaluation';
-import Report from './components/Report';
 import Setting from './components/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
 import StudentRegistration from './students/components/StudentRegistration';
@@ -16,6 +12,7 @@ import StudentProfile from './students/components/StudentProfile';
 import StudentResult from './students/components/StudentResult';
 import StudentSettings from './students/components/StudentSettings';
 import StudentLogin from './students/components/StudentLogin';
+import { adminAuth, studentAuth } from './config/firebase';
 
 
 
@@ -23,55 +20,61 @@ const router = createBrowserRouter([
 
   {
     path:"/",
-    element:<StudentRegistration/>
+    element:<StudentLogin/>
   },
 
   {
-    path:"/signup",
+    path:"/admin/signup",
     element:<Signup/>
   },
   {
-    path: "/login",
+    path: "/admin/login",
     element: <Login />
   },
   {
-    path:"/student/login",
+    path: "/student/login",
     element: <StudentLogin />
   },
   {
-    path: "/student/dashboard",
-    element: <StudentDashboard />
+    path:"/student/registration",
+    element: <StudentRegistration />
   },
+
   {
-    path: "/student/profile",
-    element: <StudentProfile />
-  },
-  {
-    path:"/student/result",
-    element:<StudentResult/>
+    element: <ProtectedRoute authInstance={studentAuth} redirectTo="/" />,
+    children: [
+      {
+        path: "/student/dashboard",
+        element: <StudentDashboard />
+      },
+      {
+        path: "/student/profile",
+        element: <StudentProfile />
+      },
+      {
+        path: "/student/result",
+        element: <StudentResult />
+      }
+    ]
   },
   {
     path: "/student/settings",
     element: <StudentSettings />
   },
   {
-    element: <ProtectedRoute/>,
+    element: <ProtectedRoute authInstance={adminAuth} redirectTo="/admin/login" />,
     children: [
       {
-        path:"/dashboard",
+        path:"/admin/dashboard",
         element:<Dashboard/>
       },
       {
-        path:"/student",
+        path:"/admin/student",
         element:<Student/>
       },
       {
-        path:"/evaluation",
+        path:"/admin/evaluation",
         element:<Evaluation/>
-      },
-      {
-        path:"/report",
-        element:<Report/>
       },
       {
         path:"/setting",

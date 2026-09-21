@@ -11,35 +11,56 @@ import signinLock from "../assets/signinLock.svg";
 import google from "../assets/google.svg";
 import secure from "../assets/secure.svg";
 
-import { auth, googleProvider } from "../config/firebase";
+import { adminAuth, googleProvider, db } from "../config/firebase";
 
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const navigate = useNavigate();
+
+    const ensureAdminAccess = async (uid) => {
+        const adminQuery = query(
+            collection(db, "admins"),
+            where("uid", "==", uid)
+        );
+
+        const adminSnapshot = await getDocs(adminQuery);
+
+        if (adminSnapshot.empty) {
+            await signOut(adminAuth);
+            throw new Error("This account does not have admin access.");
+        }
+    };
 
     // Email and password login
     const signin = async (e) => {
 
         e.preventDefault();
+        setErrorMessage("");
 
         try {
 
-            await signInWithEmailAndPassword(
-                auth,
+            const userCredential = await signInWithEmailAndPassword(
+                adminAuth,
                 email,
                 password
             );
 
-            navigate("/dashboard");
+            await ensureAdminAccess(userCredential.user.uid);
+
+            navigate("/admin/dashboard");
 
         } catch (err) {
 
             console.error("Login failed:", err);
+            setErrorMessage("Username or password is incorrect");
 
         }
     };
@@ -50,16 +71,19 @@ function Login() {
 
         try {
 
-            await signInWithPopup(
-                auth,
+            const userCredential = await signInWithPopup(
+                adminAuth,
                 googleProvider
             );
 
-            navigate("/dashboard");
+            await ensureAdminAccess(userCredential.user.uid);
+
+            navigate("/admin/dashboard");
 
         } catch (err) {
 
             console.error("Google sign-in failed:", err);
+            setErrorMessage("Username or password is incorrect");
 
         }
     };
@@ -82,7 +106,9 @@ function Login() {
 
                         <img src={emails} className="email"/>
                         <img src={lock} className="lock" />
-                        <img src={eye} className="eye" />
+                        <img src={eye} className="eye" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        />
 
 
                         <label>
@@ -113,7 +139,7 @@ function Login() {
 
                             <input
                                 className="password-input"
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Enter your password"
                                 value={password}
                                 onChange={(e) =>
@@ -122,19 +148,13 @@ function Login() {
                                 required
                             />
 
+                            {errorMessage && (
+                                <div className="error-message" style={{ color: "red", marginTop: "0px", fontSize: "13px", lineHeight: "1.2" }}>
+                                    {errorMessage}
+                                </div>
+                            )}
+
                         </label>
-
-                    </div>
-
-
-                    <div className="login-options">
-
-                        
-
-
-                        <a href="#">
-                            Forgot Password
-                        </a>
 
                     </div>
 
@@ -188,15 +208,15 @@ function Login() {
                         </button>
 
 
-                        <p>
+                        {/*<p>
 
                             Don't have an account?{" "}
 
-                            <Link to="/signup">
+                            <Link to="/admin/signup">
                                 Sign up
                             </Link>
 
-                        </p>
+                        </p>*/}
 
 
                     </div>

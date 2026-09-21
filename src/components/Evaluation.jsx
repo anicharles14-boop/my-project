@@ -227,7 +227,7 @@ function Evaluation() {
                                         </option>
                                     ))}
                                 </select>
-                                <Link to="/student" className="link">
+                                <Link to="/admin/student" className="link">
                                     <button>GO TO STUDENTS</button>
                                 </Link>
                                 

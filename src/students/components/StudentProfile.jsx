@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { db } from "../../config/firebase";
+import { db, studentAuth } from "../../config/firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { auth } from "../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 import StudentNavbar from "./StudentNavbar";
@@ -24,7 +23,7 @@ function StudentProfile() {
     const [level, setLevel] = useState("");
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = onAuthStateChanged(studentAuth, async (user) => {
             if (!user) {
                 console.log("No user is logged in");
                 return;

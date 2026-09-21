@@ -4,7 +4,7 @@ import Header from "../../components/Header";
 import "../styles/StudentDashboard.css";
 import {Link} from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { auth, db } from "../../config/firebase";
+import { studentAuth, db } from "../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import attendanceIcon from "../../assets/attendance-icon.svg";
 import bookIcon from "../../assets/book-icon.svg";
@@ -28,7 +28,7 @@ function StudentDashboard(){
     const [evaluations, setEvaluations] = useState([]);
 
     useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(studentAuth, async (user) => {
         if (!user) {
             setStudentName("");
             setAverageScore(0);

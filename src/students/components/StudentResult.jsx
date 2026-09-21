@@ -7,7 +7,7 @@ import gpaIcon from "../../assets/gpa-icon.svg";
 import performanceIcon from "../../assets/performance-icon.svg";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { db, auth } from "../../config/firebase";
+import { db, studentAuth } from "../../config/firebase";
 import coursesData from "../../data/courses";
 import { downloadResultPDF } from "../utils/downloadResultPDF";
 
@@ -93,7 +93,7 @@ function StudentResult(){
     // Get student's evaluations from Firebase
     useEffect(() => {
 
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        const unsubscribe = onAuthStateChanged(studentAuth, async (user) => {
 
             if (!user) {
                 setLoading(false);

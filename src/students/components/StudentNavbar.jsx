@@ -1,7 +1,7 @@
 import "../../styles/Navbar.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase";
+import { studentAuth } from "../../config/firebase";
 import dashboard from "../../assets/dashboard.svg";
 import shieldHalf from "../../assets/shield-half.svg";
 import student from "../../assets/student.svg";
@@ -16,8 +16,8 @@ function StudentNavbar(){
 
     async function handleLogout(){
         try{
-            await signOut(auth);
-            navigate("/student/login")
+            await signOut(studentAuth);
+            navigate("/")
         }
         catch(error){
             console.log(error)

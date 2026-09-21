@@ -40,7 +40,7 @@ function Student(){
     const navigate = useNavigate();
 
     const handleEditStudent = (student) => {
-        navigate("/evaluation", { 
+        navigate("/admin/evaluation", { 
             state: { 
                 student 
             } 

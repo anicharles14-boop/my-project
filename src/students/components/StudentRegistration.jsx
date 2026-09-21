@@ -3,13 +3,16 @@ import illustration from "../../assets/student-illustration.svg"
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { db, auth } from "../../config/firebase";
+import { db, studentAuth } from "../../config/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import shieldHalf from "../../assets/shield-half.svg";
 import studentEvaluation from "../../assets/student-evaluation.svg";
 import chart from "../../assets/chart.svg";
 import studentIllustration from "../../assets/student-illustration.png";
+import download from "../../assets/download-icon.svg";
+import departmentIcon from "../../assets/department-icon.svg";
+import levelIcon from "../../assets/level-icon.svg";
 import arrowBack from "../../assets/arrow-back.svg";
 import userName from "../../assets/user-name.svg";
 import phoneIcon from "../../assets/phone-icon.svg";
@@ -27,6 +30,7 @@ function StudentRegistration() {
     const [department, setDepartment] = useState("");
     const [level, setLevel] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     const studentsCollection = collection(db, "students");
@@ -36,7 +40,7 @@ function StudentRegistration() {
 
         try{
             const userCredential = await createUserWithEmailAndPassword(
-                auth,
+                studentAuth,
                 email,
                 password
             );
@@ -48,8 +52,8 @@ function StudentRegistration() {
                 phone: Number(phone),
                 "email address": email,
                 department: department,
-                level: level
-                
+                level: level,
+                role: "student"
             })
             navigate("/student/dashboard");
         }
@@ -118,7 +122,7 @@ function StudentRegistration() {
                                     </div>
                                     <div className="feature">
                                     <div className="feature-icon">
-                                        yes
+                                        <img src={download}/>
                                     </div>
                                     <div>
                                         <div className="feature-title">Download Reports</div>
@@ -171,6 +175,7 @@ function StudentRegistration() {
                                                 placeholder="Enter your matric number"
                                                 value={matric}
                                                 onChange={(e) => setMatric(e.target.value)}
+                                                pattern="[0-9]{4}/[0-9]{6}"
                                                 required
                                             />
                                         </div>
@@ -216,6 +221,9 @@ function StudentRegistration() {
                                     <div className="form-field">
                                         <label>Department</label>
                                         <div className="input-wrap">
+                                            <span className="input-icon">
+                                                <img src={departmentIcon}/>
+                                            </span>
                                             <select
                                                 value={department}
                                                 onChange={(e) => setDepartment(e.target.value)}
@@ -234,6 +242,9 @@ function StudentRegistration() {
                                     <div className="form-field">
                                         <label>Level</label>
                                         <div className="input-wrap">
+                                            <span className="input-icon">
+                                                <img src={levelIcon}/>
+                                            </span>
                                             <select
                                                 value={level}
                                                 onChange={(e) => setLevel(e.target.value)}
@@ -258,15 +269,17 @@ function StudentRegistration() {
                                         <img src={lock}/>
                                         </span>
                                         <input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder="Create a password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
+                                            minLength={6}
                                             required
                                         />
                                         <button
                                         type="button"
                                         className="toggle-visibility"
+                                        onClick={() => setShowPassword(!showPassword)}
                                         >
                                         <img src={eye}/> 
                                         </button>
