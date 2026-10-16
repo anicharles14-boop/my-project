@@ -6,8 +6,6 @@ import dashboard from "../assets/dashboard.svg";
 import shieldHalf from "../assets/shield-half.svg";
 import student from "../assets/student.svg";
 import evaluation from "../assets/evaluation.svg";
-import report from "../assets/report.svg";
-import setting from "../assets/setting.svg";
 import logout from "../assets/logout.svg"
 
 function Navbar(){

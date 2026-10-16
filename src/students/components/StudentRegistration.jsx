@@ -1,6 +1,5 @@
 import "../styles/StudentRegistration.css";
-import illustration from "../../assets/student-illustration.svg"
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { db, studentAuth } from "../../config/firebase";
@@ -25,7 +24,7 @@ import eyeClose from "../../assets/eye-close.svg";
 function StudentRegistration() {
 
     const [name, setName] = useState("");
-    const [phone, setPhone] = useState();
+    const [phone, setPhone] = useState("");
     const [matric, setMatric] = useState("");
     const [email, setEmail] = useState("");
     const [department, setDepartment] = useState("");
@@ -50,7 +49,7 @@ function StudentRegistration() {
                 uid: userCredential.user.uid,
                 name: name,
                 "matric number": matric,
-                phone: Number(phone),
+                phone: phone,
                 "email address": email,
                 department: department,
                 level: level,
@@ -209,7 +208,7 @@ function StudentRegistration() {
                                         <input
                                             type="tel"
                                             pattern="[0-9]{11}" 
-                                            placeholder="0801-123-1234"
+                                            placeholder="08012345678"
                                             value={phone}
                                             onChange={(e) => setPhone(e.target.value)}
                                             required

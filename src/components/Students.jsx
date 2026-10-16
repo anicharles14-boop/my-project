@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { normalizeStudentId } from "../utils/evaluations";
 
 function Student(){
 
@@ -48,41 +49,48 @@ function Student(){
     };
 
 
-    const handleDeleteStudent = async (studentId) => {
-    try {
-        const studentsSnapshot = await getDocs(collection(db, "students"));
-        const remainingStudentIds = new Set(
-            studentsSnapshot.docs
-                .map((studentDoc) => studentDoc.id)
-                .filter((id) => id !== studentId)
+    const handleDeleteStudent = async (student) => {
+        const studentName = student.name || "this student";
+
+        const confirmed = window.confirm(
+            `Delete ${studentName}? All of their evaluations will also be deleted. This action cannot be undone.`
         );
 
-        const evaluationsSnapshot = await getDocs(collection(db, "evaluations"));
-        const evaluationsToDelete = evaluationsSnapshot.docs.filter((evaluationDoc) => {
-            const studentReference = evaluationDoc.data().studentId;
-            const evaluationStudentId = typeof studentReference === "string"
-                ? studentReference
-                : studentReference?.id || studentReference?.path?.replace("students/", "");
+        if (!confirmed) {
+            return;
+        }
 
-            return !remainingStudentIds.has(evaluationStudentId);
-        });
+        try {
+            const studentsSnapshot = await getDocs(collection(db, "students"));
+            const remainingStudentIds = new Set(
+                studentsSnapshot.docs
+                    .map((studentDoc) => studentDoc.id)
+                    .filter((id) => id !== student.id)
+            );
 
-        await Promise.all(
-            evaluationsToDelete.map((evaluationDoc) =>
-                deleteDoc(doc(db, "evaluations", evaluationDoc.id))
-            )
-        );
+            const evaluationsSnapshot = await getDocs(collection(db, "evaluations"));
+            const evaluationsToDelete = evaluationsSnapshot.docs.filter((evaluationDoc) => {
+                const evaluationStudentId = normalizeStudentId(evaluationDoc.data().studentId);
 
-        await deleteDoc(doc(db, "students", studentId));
+                return !remainingStudentIds.has(evaluationStudentId);
+            });
 
-        setStudents((prevStudents) =>
-            prevStudents.filter((student) => student.id !== studentId)
-        );
+            await Promise.all(
+                evaluationsToDelete.map((evaluationDoc) =>
+                    deleteDoc(doc(db, "evaluations", evaluationDoc.id))
+                )
+            );
 
-    } catch (error) {
-        console.error("Error deleting student:", error);
-    }
-};
+            await deleteDoc(doc(db, "students", student.id));
+
+            setStudents((prevStudents) =>
+                prevStudents.filter((existingStudent) => existingStudent.id !== student.id)
+            );
+
+        } catch (error) {
+            console.error("Error deleting student:", error);
+        }
+    };
 
 
 
@@ -195,7 +203,7 @@ function Student(){
                                                 <button
                                                     className="delete-btn"
                                                     title="Delete"
-                                                    onClick={() => handleDeleteStudent(student.id)}
+                                                    onClick={() => handleDeleteStudent(student)}
                                                 >
                                                     🗑
                                                 </button>

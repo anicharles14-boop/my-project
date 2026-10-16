@@ -9,7 +9,6 @@ import lock from "../assets/lock.svg";
 import eye from "../assets/eye.svg";
 import eyeClose from "../assets/eye-close.svg";
 import signinLock from "../assets/signinLock.svg";
-import secure from "../assets/secure.svg";
 
 import { adminAuth, db } from "../config/firebase";
 
@@ -60,7 +59,19 @@ function Login() {
         } catch (err) {
 
             console.error("Login failed:", err);
-            setErrorMessage("Username or password is incorrect");
+
+            const isCredentialError = [
+                "auth/invalid-credential",
+                "auth/invalid-email",
+                "auth/user-not-found",
+                "auth/wrong-password"
+            ].includes(err?.code);
+
+            setErrorMessage(
+                isCredentialError
+                    ? "Username or password is incorrect"
+                    : err?.message || "Something went wrong. Please try again."
+            );
 
         }
     };

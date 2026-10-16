@@ -11,6 +11,8 @@ import bookIcon from "../../assets/book-icon.svg";
 import averageIcon from "../../assets/average-icon.svg";
 import coursesData from "../../data/courses";
 import { downloadResultPDF } from "../utils/downloadResultPDF";
+import { fetchStudentEvaluations } from "../../utils/evaluations";
+import StudentChatbot from "./StudentChatbot";
 
 
 
@@ -34,7 +36,7 @@ function StudentDashboard(){
             setAverageScore(0);
             setAverageAttendance(0);
             setStudentCourses([]);
-            setStudent({ name: "", department: "", level: "", matricNumber: "" });
+            setStudent({ name: "", department: "", level: "", matricNumber: "", email: "", phone: "" });
             setEvaluations([]);
             return;
         }
@@ -53,7 +55,7 @@ function StudentDashboard(){
                 setAverageScore(0);
                 setAverageAttendance(0);
                 setStudentCourses([]);
-                setStudent({ name: "", department: "", level: "", matricNumber: "" });
+                setStudent({ name: "", department: "", level: "", matricNumber: "", email: "", phone: "" });
                 setEvaluations([]);
                 return;
             }
@@ -70,6 +72,8 @@ function StudentDashboard(){
               department,
               level,
               matricNumber: studentData["matric number"] || "",
+              email: studentData["email address"] || "",
+              phone: studentData.phone || "",
             });
 
             const matchedCourses = coursesData.filter(
@@ -77,42 +81,33 @@ function StudentDashboard(){
             );
             setStudentCourses(matchedCourses);
 
-            const evaluationQuery = query(
-                collection(db, "evaluations"),
-                where("studentId", "==", studentId)
-            );
-            
-            const evaluationSnapshot = await getDocs(evaluationQuery);
-            const evaluationData = evaluationSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
+            const evaluationData = await fetchStudentEvaluations(db, studentId);
             setEvaluations(evaluationData);
-            
-            if (evaluationSnapshot.empty) {
+
+            if (evaluationData.length === 0) {
                 setAverageScore(0);
                 setAverageAttendance(0);
                 return;
             }
 
-            const total = evaluationSnapshot.docs.reduce(
-                (sum, doc) => {
-                    return sum + Number(doc.data().overall || 0);
+            const total = evaluationData.reduce(
+                (sum, evaluation) => {
+                    return sum + Number(evaluation.overall || 0);
                 },
                 0
             );
 
-            const average = total / evaluationSnapshot.docs.length;
+            const average = total / evaluationData.length;
 
             setAverageScore(average);
-            const attendanceTotal = evaluationSnapshot.docs.reduce(
-              (sum, doc) => {
-                  return sum + Number(doc.data().attendance || 0);
+            const attendanceTotal = evaluationData.reduce(
+              (sum, evaluation) => {
+                  return sum + Number(evaluation.attendance || 0);
               },
               0
             );
 
-            const attendanceAverage = attendanceTotal / evaluationSnapshot.docs.length;
+            const attendanceAverage = attendanceTotal / evaluationData.length;
             setAverageAttendance(attendanceAverage);
 
         } catch (error) {
@@ -202,7 +197,8 @@ function StudentDashboard(){
           </div>
         </div>
 
-        <div className="quick-links">
+        <div className="dash-side-column">
+          <div className="quick-links">
 			<h2>Quick Links</h2>
 			<Link to="/student/result" className="the-link">
 				<div className="view-result">
@@ -222,6 +218,9 @@ function StudentDashboard(){
         </button>
 			
         
+          </div>
+
+          <StudentChatbot student={student} evaluations={evaluations} courses={studentCourses} />
         </div>
       </div>
     </div>

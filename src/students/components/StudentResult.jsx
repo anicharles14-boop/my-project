@@ -8,65 +8,9 @@ import performanceIcon from "../../assets/performance-icon.svg";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { db, studentAuth } from "../../config/firebase";
-import coursesData from "../../data/courses";
 import { downloadResultPDF } from "../utils/downloadResultPDF";
-
-const IconBox = ({ size = "" }) => (
-  <span className={`result-icon-box ${size ? `result-${size}` : ""}`}></span>
-);
-
-const courseMap = Object.fromEntries(
-    coursesData.map((course) => [course.code, course])
-);
-
-const getGrade = (score) => {
-    if (score >= 70) return "A";
-    if (score >= 60) return "B";
-    if (score >= 50) return "C";
-    if (score >= 45) return "D";
-    if (score >= 40) return "E";
-
-    return "F";
-};
-
-const gradePoints = {
-    A: 5,
-    B: 4,
-    C: 3,
-    D: 2,
-    E: 1,
-    F: 0
-};
-
-const getGradeBasedGpa = (coursesList) => {
-    const totalQualityPoints = coursesList.reduce((total, course) => {
-        const grade = getGrade(course.overall);
-        const point = gradePoints[grade] || 0;
-        const unit = courseMap[course.course]?.credit || 0;
-
-        return total + (point * unit);
-    }, 0);
-
-    const totalUnits = coursesList.reduce((total, course) => {
-        return total + (courseMap[course.course]?.credit || 0);
-    }, 0);
-
-    if (totalUnits === 0) return "0.00";
-
-    return (totalQualityPoints / totalUnits).toFixed(2);
-};
-
-
-
-const getPerformanceLevel = (gpaValue) => {
-    const score = Number(gpaValue) || 0;
-
-    if (score >= 4.5) return "Excellent";
-    if (score >= 4.0) return "Very Good";
-    if (score >= 3.0) return "Good";
-
-    return "Poor";
-};
+import { fetchStudentEvaluations } from "../../utils/evaluations";
+import { courseMap, getGrade, getGpa, getPerformanceLevel } from "../../utils/grades";
 
 const getPerformanceClass = (gpaValue) => {
     const level = getPerformanceLevel(gpaValue);
@@ -87,7 +31,6 @@ function StudentResult(){
         level: "",
         matricNumber: "",
     });
-    const [loading, setLoading] = useState(true);
 
     
     // Get student's evaluations from Firebase
@@ -96,7 +39,6 @@ function StudentResult(){
         const unsubscribe = onAuthStateChanged(studentAuth, async (user) => {
 
             if (!user) {
-                setLoading(false);
                 return;
             }
 
@@ -112,7 +54,6 @@ function StudentResult(){
 
                 if (studentSnapshot.empty) {
                     console.log("Student not found");
-                    setLoading(false);
                     return;
                 }
 
@@ -126,17 +67,7 @@ function StudentResult(){
                 });
 
                 // Find evaluations belonging to this student
-                const evaluationQuery = query(
-                    collection(db, "evaluations"),
-                    where("studentId", "==", studentDoc.id)
-                );
-
-                const evaluationSnapshot = await getDocs(evaluationQuery);
-
-                const evaluationData = evaluationSnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
+                const evaluationData = await fetchStudentEvaluations(db, studentDoc.id);
 
                 setCourses(evaluationData);
 
@@ -150,8 +81,6 @@ function StudentResult(){
                 console.error("Error getting results:", error);
 
             }
-
-            setLoading(false);
         });
 
         return () => unsubscribe();
@@ -159,7 +88,7 @@ function StudentResult(){
     }, []);
 
 
-    const gpa = getGradeBasedGpa(courses);
+    const gpa = getGpa(courses);
 
     // Overall score of selected course
     const overallScore = selectedCourse?.overall ?? 0;

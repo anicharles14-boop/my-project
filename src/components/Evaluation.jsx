@@ -1,21 +1,35 @@
 import Navbar from "./Navbar";
 import Header from "./Header";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import "../styles/Evaluation.css";
 import { db } from "../config/firebase";
-import { collection, addDoc, query, where, getDocs, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import coursesData from "../data/courses";
+import { fetchStudentEvaluations } from "../utils/evaluations";
 
 function Evaluation() {
 
     const location = useLocation();
     const selectedStudent = location.state?.student;
 
+    // Keying by student re-mounts the form when a different student is
+    // selected, which resets all of its evaluation state.
+    return (
+        <EvaluationForm
+            key={selectedStudent?.id || "no-student"}
+            selectedStudent={selectedStudent}
+        />
+    );
+}
+
+function EvaluationForm({ selectedStudent }) {
+
     const [selectedCourse, setSelectedCourse] = useState("");
     const [scores, setScores] = useState({});
     const [result, setResult] = useState(null);
+    const [saving, setSaving] = useState(false);
 
     const availableCourses = selectedStudent
         ? coursesData.filter(
@@ -24,12 +38,6 @@ function Evaluation() {
                 course.level === String(selectedStudent.level)
         )
         : [];
-
-    useEffect(() => {
-        setSelectedCourse("");
-        setScores({});
-        setResult(null);
-    }, [selectedStudent?.id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -94,16 +102,9 @@ function Evaluation() {
 
     const evaluateStudent = async () => {
 
-        setResult({
-            overall: overallScore,
-            level: getPerformance(),
-            recommendation: getRecommendation(),
-        });
-        await saveEvaluation();
-
-    };
-
-    const saveEvaluation = async () => {
+        if (saving) {
+            return;
+        }
 
         if (!selectedStudent) {
             alert("No student selected");
@@ -115,15 +116,33 @@ function Evaluation() {
             return;
         }
 
+        setSaving(true);
+
+        try {
+            setResult({
+                overall: overallScore,
+                level: getPerformance(),
+                recommendation: getRecommendation(),
+            });
+            await saveEvaluation();
+        } finally {
+            setSaving(false);
+        }
+
+    };
+
+    const saveEvaluation = async () => {
+
         try {
 
-            const evaluationQuery = query(
-                collection(db, "evaluations"),
-                where("studentId", "==", selectedStudent.id),
-                where("course", "==", selectedCourse)
+            const existingEvaluations = await fetchStudentEvaluations(
+                db,
+                selectedStudent.id
             );
 
-            const existingEvaluation = await getDocs(evaluationQuery);
+            const existingEvaluation = existingEvaluations.find(
+                (evaluation) => evaluation.course === selectedCourse
+            );
 
             const evaluationData = {
                 studentId: selectedStudent.id,
@@ -141,13 +160,11 @@ function Evaluation() {
                 updatedAt: serverTimestamp()
             };
 
-            if (!existingEvaluation.empty) {
+            if (existingEvaluation) {
 
                 // Evaluation already exists → update it
-                const evaluationDoc = existingEvaluation.docs[0];
-
                 await updateDoc(
-                    evaluationDoc.ref,
+                    doc(db, "evaluations", existingEvaluation.id),
                     evaluationData
                 );
 
@@ -305,8 +322,12 @@ function Evaluation() {
                             </div>
 
 
-                            <button className="evaluate-student-btn" onClick={evaluateStudent}>
-                                Evaluate Student
+                            <button
+                                className="evaluate-student-btn"
+                                onClick={evaluateStudent}
+                                disabled={saving}
+                            >
+                                {saving ? "Saving..." : "Evaluate Student"}
                             </button>
 
                         </div>

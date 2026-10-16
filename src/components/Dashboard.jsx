@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs,query, orderBy } from "firebase/firestore";
+import { collection, documentId, getCountFromServer, getDocs, query, where } from "firebase/firestore";
 import { db } from "../config/firebase";
+import { normalizeStudentId } from "../utils/evaluations";
 import studentIcon from "../assets/student.svg";
 import evaluationIcon from "../assets/evaluation.svg";
 import averageIcon from "../assets/average-score-icon.svg";
@@ -8,6 +9,33 @@ import highestIcon from "../assets/highest-icon.svg";
 import Navbar from "./Navbar";
 import Header from "./Header";
 import "../styles/Dashboard.css"
+
+const fetchStudentNames = async (studentIds) => {
+    const uniqueIds = [...new Set(studentIds.filter(Boolean))];
+    const names = {};
+
+    if (uniqueIds.length === 0) {
+        return names;
+    }
+
+    // Firestore "in" queries are limited to 30 values per request.
+    for (let index = 0; index < uniqueIds.length; index += 30) {
+        const idBatch = uniqueIds.slice(index, index + 30);
+
+        const studentsSnapshot = await getDocs(
+            query(
+                collection(db, "students"),
+                where(documentId(), "in", idBatch)
+            )
+        );
+
+        studentsSnapshot.forEach((studentDoc) => {
+            names[studentDoc.id] = studentDoc.data().name || "";
+        });
+    }
+
+    return names;
+};
 
 function Dashboard(){
 
@@ -22,70 +50,62 @@ function Dashboard(){
 
         const getData = async () => {
 
-            const studentSnapshot = await getDocs(
+            // Server-side count — avoids downloading every student document.
+            const studentCountSnapshot = await getCountFromServer(
                 collection(db, "students")
             );
-            setTotalStudents(studentSnapshot.size);
-            const students = {};
-                studentSnapshot.docs.forEach((doc) => {
-                    students[doc.id] = doc.data();
-            });
+            setTotalStudents(studentCountSnapshot.data().count);
 
+            // Single read of evaluations, reused for the stats and the table.
             const evaluationSnapshot = await getDocs(
                 collection(db, "evaluations")
             );
-            const validEvaluationDocs = evaluationSnapshot.docs.filter(
-                (evaluationDoc) => students[evaluationDoc.data().studentId]
-            );
-            setTotalEvaluations(validEvaluationDocs.length);
 
-            const scores = validEvaluationDocs.map(
-            (doc) => doc.data().overall
-            );
+            const evaluations = evaluationSnapshot.docs
+                .map((evaluationDoc) => ({
+                    id: evaluationDoc.id,
+                    ...evaluationDoc.data(),
+                    studentId: normalizeStudentId(evaluationDoc.data().studentId)
+                }))
+                .sort((first, second) => {
+                    const firstTime = first.createdAt?.toDate?.().getTime() ?? 0;
+                    const secondTime = second.createdAt?.toDate?.().getTime() ?? 0;
 
+                    return secondTime - firstTime;
+                });
+
+            setTotalEvaluations(evaluations.length);
+
+            const scores = evaluations
+                .map((evaluation) => Number(evaluation.overall))
+                .filter(Number.isFinite);
 
             if (scores.length > 0) {
 
                 const totalScore = scores.reduce(
-                    (sum, score) => sum + Number(score),
+                    (sum, score) => sum + score,
                     0
                 );
-                const average = totalScore / scores.length;
-                setAverageScore(average);
-
-
-                const highest = Math.max(
-                    ...scores.map(score => Number(score))
-                );
-                setHighestScore(highest);
+                setAverageScore(totalScore / scores.length);
+                setHighestScore(Math.max(...scores));
 
             } else {
                 setAverageScore(0);
                 setHighestScore(0);
             }
 
-            const evaluationQuery = query(
-                collection(db, "evaluations"),
-                orderBy("createdAt", "desc")
+            // Only fetch names for the students that actually appear in the table.
+            const studentNames = await fetchStudentNames(
+                evaluations.map((evaluation) => evaluation.studentId)
             );
 
-            const recentSnapshot = await getDocs(evaluationQuery);
-
-            setRecentEvaluations(recentSnapshot.docs
-                .filter((doc) => students[doc.data().studentId])
-                .map((doc) => {
-
-                const evaluation = doc.data();
-                const student = students[evaluation.studentId];
-
-                return {
-                    id: doc.id,
-                    ...evaluation,
-                    name: student?.name,
-                    course: evaluation.course
-                };
-
-                })
+            setRecentEvaluations(
+                evaluations
+                    .filter((evaluation) => studentNames[evaluation.studentId] !== undefined)
+                    .map((evaluation) => ({
+                        ...evaluation,
+                        name: studentNames[evaluation.studentId]
+                    }))
             );
 
         };
@@ -226,11 +246,15 @@ function Dashboard(){
                                             </td>
 
                                             <td>
-                                                <span
-                                                    className={`performance-badge ${evaluation.level.toLowerCase()}`}
-                                                >
-                                                    {evaluation.level}
-                                                </span>
+                                                {evaluation.level ? (
+                                                    <span
+                                                        className={`performance-badge ${String(evaluation.level).toLowerCase()}`}
+                                                    >
+                                                        {evaluation.level}
+                                                    </span>
+                                                ) : (
+                                                    "—"
+                                                )}
                                             </td>
 
                                             <td className="evaluation-date">

@@ -1,36 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import coursesData from "../../data/courses";
-
-const courseMap = Object.fromEntries(
-    coursesData.map((course) => [course.code, course])
-);
-
-const getGrade = (score) => {
-    if (score >= 70) return "A";
-    if (score >= 60) return "B";
-    if (score >= 50) return "C";
-    if (score >= 45) return "D";
-    if (score >= 40) return "E";
-    return "F";
-};
-
-const gradePoints = { A: 5, B: 4, C: 3, D: 2, E: 1, F: 0 };
-
-const getGpa = (courses) => {
-    const totalQualityPoints = courses.reduce((total, course) => {
-        const point = gradePoints[getGrade(course.overall)] || 0;
-        const unit = courseMap[course.course]?.credit || 0;
-        return total + point * unit;
-    }, 0);
-
-    const totalUnits = courses.reduce(
-        (total, course) => total + (courseMap[course.course]?.credit || 0),
-        0,
-    );
-
-    return totalUnits === 0 ? "0.00" : (totalQualityPoints / totalUnits).toFixed(2);
-};
+import { courseMap, getGrade, getGpa } from "../../utils/grades";
 
 export function downloadResultPDF({ student, courses }) {
     const doc = new jsPDF();

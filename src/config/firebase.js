@@ -12,7 +12,7 @@ const firebaseConfig = {
 };
 
 const adminApp = initializeApp(firebaseConfig, "adminApp");
-const studentApp = initializeApp(firebaseConfig, "studentApp");
+export const studentApp = initializeApp(firebaseConfig, "studentApp");
 
 export const adminAuth = getAuth(adminApp);
 export const studentAuth = getAuth(studentApp);

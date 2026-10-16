@@ -16,13 +16,15 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate()
 
   const signup = async (e) => {
     e.preventDefault();
-
-    // no confirm-password check
+    setErrorMessage("");
+    setSubmitting(true);
 
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -42,6 +44,18 @@ function Signup() {
 
     } catch (err) {
       console.error(err);
+
+      if (err?.code === "auth/email-already-in-use") {
+        setErrorMessage("An account with this email already exists.");
+      } else if (err?.code === "auth/weak-password") {
+        setErrorMessage("Password must be at least 6 characters long.");
+      } else if (err?.code === "auth/invalid-email") {
+        setErrorMessage("Please enter a valid email address.");
+      } else {
+        setErrorMessage("Sign up failed. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -82,16 +96,23 @@ function Signup() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                minLength={6}
                 required
               />
+
+              {errorMessage && (
+                <div className="error-message" style={{ color: "red", marginTop: "0px", fontSize: "13px", lineHeight: "1.2" }}>
+                  {errorMessage}
+                </div>
+              )}
             </label>
            
           </div>
 
           <div className="signup-actions">
-            <button className="signup-btn" type="submit">
+            <button className="signup-btn" type="submit" disabled={submitting}>
               <img src={signupLock} className="signup-lock" alt="lock icon" />
-              Sign up
+              {submitting ? "Signing up..." : "Sign up"}
             </button>
 
             <p>
