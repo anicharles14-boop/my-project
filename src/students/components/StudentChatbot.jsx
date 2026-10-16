@@ -4,7 +4,9 @@ import { studentApp } from "../../config/firebase";
 import { courseMap, getGrade, getGpa, getPerformanceLevel } from "../../utils/grades";
 import "../styles/StudentChatbot.css";
 
-const MODEL_NAME = "gemini-3.8-flash";
+// Flash-Lite models get a much larger free daily allowance than the flagship
+// "flash" models (the newest ones are capped at ~20 requests/day on free tier).
+const MODEL_NAME = "gemini-3.5-flash-lite";
 
 const ai = getAI(studentApp, { backend: new GoogleAIBackend() });
 
@@ -170,12 +172,31 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
         } catch (error) {
             console.error("Chatbot error:", error);
 
+            const status = error?.customErrorData?.status;
+            const isQuotaError =
+                status === 429 || /quota|429|too many requests/i.test(error?.message || "");
+
+            let errorText =
+                "Sorry, I couldn't reach the assistant right now. Please try again in a moment.";
+
+            if (isQuotaError) {
+                const retryDelay = error?.customErrorData?.errorDetails?.find((detail) =>
+                    detail["@type"]?.includes("RetryInfo")
+                )?.retryDelay;
+
+                const retryHours = Math.ceil(parseInt(retryDelay, 10) / 3600);
+
+                errorText = Number.isFinite(retryHours)
+                    ? `I've reached the free AI limit (20 messages/day). Please try again in about ${retryHours} hour${retryHours === 1 ? "" : "s"}.`
+                    : "I've reached the free AI limit (20 messages/day). Please try again later.";
+            }
+
             setMessages((previous) => [
                 ...previous,
                 {
                     role: "model",
                     isError: true,
-                    text: "Sorry, I couldn't reach the assistant right now. Please try again in a moment."
+                    text: errorText
                 },
             ]);
         } finally {

@@ -8,6 +8,7 @@ import { db } from "../config/firebase";
 import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import coursesData from "../data/courses";
 import { fetchStudentEvaluations } from "../utils/evaluations";
+import { usePopup } from "./PopupContext";
 
 function Evaluation() {
 
@@ -30,6 +31,7 @@ function EvaluationForm({ selectedStudent }) {
     const [scores, setScores] = useState({});
     const [result, setResult] = useState(null);
     const [saving, setSaving] = useState(false);
+    const { showMessage } = usePopup();
 
     const availableCourses = selectedStudent
         ? coursesData.filter(
@@ -100,6 +102,20 @@ function EvaluationForm({ selectedStudent }) {
     };
 
 
+    const getLevelClass = (level) => {
+
+        if (level === "Excellent") return "level-excellent";
+
+        if (level === "Very Good") return "level-very-good";
+
+        if (level === "Good") return "level-good";
+
+        if (level === "Average") return "level-average";
+
+        return "level-fail";
+    };
+
+
     const evaluateStudent = async () => {
 
         if (saving) {
@@ -107,12 +123,12 @@ function EvaluationForm({ selectedStudent }) {
         }
 
         if (!selectedStudent) {
-            alert("No student selected");
+            showMessage("No student selected", { variant: "error" });
             return;
         }
 
         if (!selectedCourse) {
-            alert("Please select a course");
+            showMessage("Please select a course", { variant: "error" });
             return;
         }
 
@@ -168,7 +184,7 @@ function EvaluationForm({ selectedStudent }) {
                     evaluationData
                 );
 
-                alert("Evaluation updated successfully!");
+                showMessage("Evaluation updated successfully!", { variant: "success" });
 
             } else {
 
@@ -181,13 +197,13 @@ function EvaluationForm({ selectedStudent }) {
                     }
                 );
 
-                alert("Evaluation saved successfully!");
+                showMessage("Evaluation saved successfully!", { variant: "success" });
             }
 
         } catch (error) {
 
             console.error("Error saving evaluation:", error);
-            alert("Failed to save evaluation");
+            showMessage("Failed to save evaluation. Please try again.", { variant: "error" });
 
         }
     };
@@ -362,7 +378,7 @@ function EvaluationForm({ selectedStudent }) {
                                 {result && (
 
                                     <span
-                                        className="level"
+                                        className={"level " + getLevelClass(result.level)}
                                     >
                                         {result.level}
                                     </span>
