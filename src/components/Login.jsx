@@ -7,13 +7,13 @@ import shield from "../assets/shield.svg";
 import emails from "../assets/emails.svg";
 import lock from "../assets/lock.svg";
 import eye from "../assets/eye.svg";
+import eyeClose from "../assets/eye-close.svg";
 import signinLock from "../assets/signinLock.svg";
-import google from "../assets/google.svg";
 import secure from "../assets/secure.svg";
 
-import { adminAuth, googleProvider, db } from "../config/firebase";
+import { adminAuth, db } from "../config/firebase";
 
-import { signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
 function Login() {
@@ -66,29 +66,6 @@ function Login() {
     };
 
 
-    // Google login
-    const signinGoogle = async () => {
-
-        try {
-
-            const userCredential = await signInWithPopup(
-                adminAuth,
-                googleProvider
-            );
-
-            await ensureAdminAccess(userCredential.user.uid);
-
-            navigate("/admin/dashboard");
-
-        } catch (err) {
-
-            console.error("Google sign-in failed:", err);
-            setErrorMessage("Username or password is incorrect");
-
-        }
-    };
-
-
     return (
 
         <div className="login-page">
@@ -98,6 +75,7 @@ function Login() {
                 <img src={shield} className="shield"/>
 
                 <h1>Admin Login</h1>
+                <p>Sign in to your account</p>
 
 
                 <form onSubmit={signin}>
@@ -106,8 +84,11 @@ function Login() {
 
                         <img src={emails} className="email"/>
                         <img src={lock} className="lock" />
-                        <img src={eye} className="eye" 
-                        onClick={() => setShowPassword(!showPassword)}
+                        <img
+                            src={showPassword ? eyeClose : eye}
+                            className="eye"
+                            alt={showPassword ? "hide password" : "show password"}
+                            onClick={() => setShowPassword(!showPassword)}
                         />
 
 
@@ -179,36 +160,7 @@ function Login() {
                         </button>
 
 
-                        <div className="line">
-
-                            <hr />
-
-                            <span>OR</span>
-
-                            <hr />
-
-                        </div>
-
-
-                        {/* Google login */}
-
-                        <button
-                            type="button"
-                            className="signin-google"
-                            onClick={signinGoogle}
-                        >
-
-                            <img
-                                src={google}
-                                className="google-signin"
-                            />
-
-                            Sign in with Google
-
-                        </button>
-
-
-                        {/*<p>
+                        <p>
 
                             Don't have an account?{" "}
 
@@ -216,7 +168,7 @@ function Login() {
                                 Sign up
                             </Link>
 
-                        </p>*/}
+                        </p>
 
 
                     </div>

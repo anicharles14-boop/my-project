@@ -91,9 +91,8 @@ function Student(){
     const levels = [...new Set(students.map((student) => student.level).filter(Boolean))].sort();
 
     const filteredStudents = students.filter((student) => {
-        const matchesSearch = `${student.matric} ${student["matric number"]} ${student.name} ${student.department}`
-            .toLowerCase()
-            .includes(search.toLowerCase());
+        const studentName = (student.name || "").toLowerCase();
+        const matchesSearch = studentName.includes(search.toLowerCase());
         const matchesDepartment = !departmentFilter || student.department === departmentFilter;
         const matchesLevel = !levelFilter || String(student.level) === levelFilter;
 

@@ -5,6 +5,7 @@ import shield from "../../assets/shield.svg";
 import emails from "../../assets/emails.svg";
 import lock from "../../assets/lock.svg";
 import eye from "../../assets/eye.svg";
+import eyeClose from "../../assets/eye-close.svg";
 import signupLock from "../../assets/signinLock.svg";
 import { studentAuth, db } from "../../config/firebase";
 
@@ -66,9 +67,12 @@ function StudentLogin() {
                     <div className="ep-input-signup">
                         <img src={emails} className="email" alt="email icon" />
                         <img src={lock} className="lock" alt="lock icon" />
-                        <img src={eye} className="eye-signup" alt="eye icon"
-                        onClick={() => setShowPassword(!showPassword)}
-                         />
+                        <img
+                            src={showPassword ? eyeClose : eye}
+                            className="eye-signup"
+                            alt={showPassword ? "hide password" : "show password"}
+                            onClick={() => setShowPassword(!showPassword)}
+                        />
 
                         <label>
                         Email Address<br />

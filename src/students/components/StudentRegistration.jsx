@@ -20,6 +20,7 @@ import matricIcon from "../../assets/matric-icon.svg";
 import emails from "../../assets/emails.svg";
 import lock from "../../assets/lock.svg";
 import eye from "../../assets/eye.svg";
+import eyeClose from "../../assets/eye-close.svg";
 
 function StudentRegistration() {
 
@@ -280,8 +281,9 @@ function StudentRegistration() {
                                         type="button"
                                         className="toggle-visibility"
                                         onClick={() => setShowPassword(!showPassword)}
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
                                         >
-                                        <img src={eye}/> 
+                                        <img src={showPassword ? eyeClose : eye} alt={showPassword ? "Hide password" : "Show password"} />
                                         </button>
                                     </div>
                                     

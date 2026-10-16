@@ -62,12 +62,7 @@ function StudentNavbar(){
                 </NavLink>
                 
                 
-                <NavLink to="/setting" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
-                    <div className="setting">
-                        <img src={setting}/>
-                        Settings
-                    </div>
-                </NavLink>
+                
                 
                 <Link className="link navbar-logout" onClick={handleLogout}>
                     <div >
