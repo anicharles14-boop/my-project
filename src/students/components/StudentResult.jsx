@@ -287,8 +287,8 @@ function StudentResult(){
                                         <div className="result-meta-row">
                                             <span className="result-meta-row-label">Evaluation Date</span>
                                             <span className="result-meta-row-value">
-                                                {selectedCourse?.createdAt
-                                                    ? selectedCourse.createdAt.toDate().toLocaleDateString()
+                                                {(selectedCourse?.updatedAt ?? selectedCourse?.createdAt)
+                                                    ? (selectedCourse.updatedAt ?? selectedCourse.createdAt).toDate().toLocaleDateString()
                                                     : "N/A"}
                                             </span>
                                         </div>

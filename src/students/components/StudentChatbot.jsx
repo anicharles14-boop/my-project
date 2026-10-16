@@ -55,7 +55,7 @@ const buildResultsContext = (evaluations = []) => {
             return [
                 `- ${evaluation.course} (${courseInfo.name}): overall ${evaluation.overall ?? 0}% (grade ${getGrade(evaluation.overall)});`,
                 `attendance ${evaluation.attendance ?? 0}%, assignment ${evaluation.assignment ?? 0}%, test ${evaluation.test ?? 0}%, exam ${evaluation.exam ?? 0}%;`,
-                `evaluated ${formatDate(evaluation.createdAt)}`,
+                `last evaluated ${formatDate(evaluation.updatedAt ?? evaluation.createdAt)}`,
             ].join(" ");
         })
         .join("\n");

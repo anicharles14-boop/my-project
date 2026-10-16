@@ -68,8 +68,8 @@ function Dashboard(){
                     studentId: normalizeStudentId(evaluationDoc.data().studentId)
                 }))
                 .sort((first, second) => {
-                    const firstTime = first.createdAt?.toDate?.().getTime() ?? 0;
-                    const secondTime = second.createdAt?.toDate?.().getTime() ?? 0;
+                    const firstTime = (first.updatedAt ?? first.createdAt)?.toDate?.().getTime() ?? 0;
+                    const secondTime = (second.updatedAt ?? second.createdAt)?.toDate?.().getTime() ?? 0;
 
                     return secondTime - firstTime;
                 });
@@ -258,7 +258,7 @@ function Dashboard(){
                                             </td>
 
                                             <td className="evaluation-date">
-                                                {evaluation.createdAt?.toDate().toLocaleDateString("en-US", {
+                                                {(evaluation.updatedAt ?? evaluation.createdAt)?.toDate().toLocaleDateString("en-US", {
                                                     year: "numeric",
                                                     month: "long",
                                                     day: "numeric"
