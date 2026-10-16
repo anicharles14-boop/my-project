@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { db } from "../config/firebase";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { normalizeStudentId } from "../utils/evaluations";
+import { usePopup } from "./PopupContext";
 
 function Student(){
 
@@ -39,6 +40,7 @@ function Student(){
     const [departmentFilter, setDepartmentFilter] = useState("");
     const [levelFilter, setLevelFilter] = useState("");
     const navigate = useNavigate();
+    const { showConfirm, showMessage } = usePopup();
 
     const handleEditStudent = (student) => {
         navigate("/admin/evaluation", { 
@@ -52,9 +54,13 @@ function Student(){
     const handleDeleteStudent = async (student) => {
         const studentName = student.name || "this student";
 
-        const confirmed = window.confirm(
-            `Delete ${studentName}? All of their evaluations will also be deleted. This action cannot be undone.`
-        );
+        const confirmed = await showConfirm({
+            title: "Delete Student?",
+            message: `Are you sure you want to delete ${studentName}? All of their evaluations will also be deleted. This action cannot be undone.`,
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            variant: "danger",
+        });
 
         if (!confirmed) {
             return;
@@ -89,6 +95,7 @@ function Student(){
 
         } catch (error) {
             console.error("Error deleting student:", error);
+            showMessage("Failed to delete the student. Please try again.", { variant: "error" });
         }
     };
 
