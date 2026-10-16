@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet, ScrollRestoration } from 'react-router-dom';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
@@ -16,76 +16,86 @@ import { adminAuth, studentAuth } from './config/firebase';
 
 
 
+// Resets the scroll position to the top on every navigation
+// (and restores it when going back/forward).
+function RootLayout() {
+  return (
+    <>
+      <ScrollRestoration />
+      <Outlet />
+    </>
+  );
+}
+
 const router = createBrowserRouter([
-
   {
-    path:"/",
-    element:<StudentLogin/>
-  },
-
-  {
-    path:"/admin/signup",
-    element:<Signup/>
-  },
-  {
-    path: "/admin/login",
-    element: <Login />
-  },
-  {
-    path: "/student/login",
-    element: <StudentLogin />
-  },
-  {
-    path:"/student/registration",
-    element: <StudentRegistration />
-  },
-
-  {
-    element: <ProtectedRoute authInstance={studentAuth} redirectTo="/" />,
+    element: <RootLayout />,
     children: [
       {
-        path: "/student/dashboard",
-        element: <StudentDashboard />
+        path: "/",
+        element: <StudentLogin />
       },
       {
-        path: "/student/profile",
-        element: <StudentProfile />
+        path: "/admin/signup",
+        element: <Signup />
       },
       {
-        path: "/student/result",
-        element: <StudentResult />
+        path: "/admin/login",
+        element: <Login />
+      },
+      {
+        path: "/student/login",
+        element: <StudentLogin />
+      },
+      {
+        path: "/student/registration",
+        element: <StudentRegistration />
+      },
+      {
+        element: <ProtectedRoute authInstance={studentAuth} redirectTo="/" />,
+        children: [
+          {
+            path: "/student/dashboard",
+            element: <StudentDashboard />
+          },
+          {
+            path: "/student/profile",
+            element: <StudentProfile />
+          },
+          {
+            path: "/student/result",
+            element: <StudentResult />
+          }
+        ]
+      },
+      {
+        path: "/student/settings",
+        element: <StudentSettings />
+      },
+      {
+        element: <ProtectedRoute authInstance={adminAuth} redirectTo="/admin/login" />,
+        children: [
+          {
+            path: "/admin/dashboard",
+            element: <Dashboard />
+          },
+          {
+            path: "/admin/student",
+            element: <Student />
+          },
+          {
+            path: "/admin/evaluation",
+            element: <Evaluation />
+          },
+          {
+            path: "/setting",
+            element: <Setting />
+          }
+        ]
       }
     ]
-  },
-  {
-    path: "/student/settings",
-    element: <StudentSettings />
-  },
-  {
-    element: <ProtectedRoute authInstance={adminAuth} redirectTo="/admin/login" />,
-    children: [
-      {
-        path:"/admin/dashboard",
-        element:<Dashboard/>
-      },
-      {
-        path:"/admin/student",
-        element:<Student/>
-      },
-      {
-        path:"/admin/evaluation",
-        element:<Evaluation/>
-      },
-      {
-        path:"/setting",
-        element:<Setting/>
-      }
-    ]
-
   }
-
-  
-])
+]);
 
 function App() {
 

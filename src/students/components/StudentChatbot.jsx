@@ -115,7 +115,7 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
     const [sending, setSending] = useState(false);
 
     const chatRef = useRef(null);
-    const messagesEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
 
     const firstName = (student?.name || "").split(" ")[0];
 
@@ -133,8 +133,14 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
         chatRef.current = null;
     }, [model]);
 
+    // Keep the chat list scrolled to the newest message.
+    // This scrolls only the chat container, never the whole page.
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        const container = messagesContainerRef.current;
+
+        if (container) {
+            container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+        }
     }, [messages, sending]);
 
     const sendMessage = async (event) => {
@@ -187,7 +193,7 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
                 Ask me about your profile, results, or study tips
             </p>
 
-            <div className="chatbot-messages">
+            <div className="chatbot-messages" ref={messagesContainerRef}>
                 <div className="chatbot-message chatbot-message-model">
                     {`Hi ${firstName || "there"}! 👋 I'm your UniEval assistant — ask me about your results, profile, courses, or study tips.`}
                 </div>
@@ -213,7 +219,6 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
                     </div>
                 )}
 
-                <div ref={messagesEndRef} />
             </div>
 
             <form className="chatbot-form" onSubmit={sendMessage}>
