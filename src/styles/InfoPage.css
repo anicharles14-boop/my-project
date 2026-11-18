@@ -1,0 +1,93 @@
+/* Shared by the "Page not found" and "Terms & Privacy" pages */
+
+.info-page {
+    min-height: 100vh;
+    padding: 48px 16px;
+    background-color: #f4f6fa;
+    color: #111827;
+}
+
+.info-card {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background-color: #ffffff;
+}
+
+.info-card-small {
+    max-width: 460px;
+    text-align: center;
+}
+
+.info-brand {
+    display: inline-block;
+    margin-bottom: 24px;
+    font-weight: 700;
+    color: #171e2e;
+    text-decoration: none;
+}
+
+.info-card h1 {
+    margin: 0 0 12px;
+    font-size: 28px;
+}
+
+.info-card h2 {
+    margin: 32px 0 10px;
+    font-size: 20px;
+}
+
+.info-card p,
+.info-card li {
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+.info-card ul {
+    padding-left: 20px;
+}
+
+.info-code {
+    margin: 0 0 8px;
+    font-size: 48px;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.info-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.info-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border: 1px solid #2563eb;
+    border-radius: 6px;
+    background-color: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.info-btn-outline {
+    background-color: #ffffff;
+    color: #2563eb;
+}
+
+.info-updated {
+    margin-top: 32px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+@media (max-width: 560px) {
+    .info-card {
+        padding: 24px 20px;
+    }
+}

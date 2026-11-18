@@ -285,3 +285,69 @@
   font-weight: bold;
   cursor: pointer;
 }
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Shown when creating the account fails */
+.form-error {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* ---------- Tablets and phones ---------- */
+
+@media (max-width: 800px) {
+  .page {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .header {
+    padding: 4px 4px 16px;
+  }
+
+  /* Put the welcome panel above the form instead of beside it */
+  .the-body {
+    flex-direction: column;
+  }
+
+  .left-panel,
+  .right-panel {
+    padding: 24px;
+  }
+
+  /* One field per line, so each input is full width */
+  .form-row {
+    flex-direction: column;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 560px) {
+  /* The illustration and feature list push the form far down on phones */
+  .image-placeholder,
+  .features {
+    display: none;
+  }
+
+  .left-panel {
+    padding: 20px;
+  }
+
+  .left-title {
+    font-size: 24px;
+  }
+
+  .right-panel {
+    padding: 20px;
+  }
+}

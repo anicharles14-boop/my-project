@@ -135,7 +135,7 @@ function StudentDashboard(){
       <div className="dash-stats">
         <div className="dash-stat-card">
           <div className="dash-stat-icon dash-score-icon">
-            <img src={averageIcon}/>
+            <img alt="" src={averageIcon}/>
           </div>
           <div className="dash-stat-content">
             <span className="dash-stat-label">Average Score</span>
@@ -145,7 +145,7 @@ function StudentDashboard(){
 
         <div className="dash-stat-card">
           <div className="dash-stat-icon dash-attendance-icon">
-            <img src={attendanceIcon}/>
+            <img alt="" src={attendanceIcon}/>
           </div>
           <div className="dash-stat-content">
             <span className="dash-stat-label">Attendance</span>
@@ -155,7 +155,7 @@ function StudentDashboard(){
 
         <div className="dash-stat-card">
           <div className="dash-stat-icon dash-courses-icon">
-            <img src={bookIcon}/>
+            <img alt="" src={bookIcon}/>
           </div>
           <div className="dash-stat-content">
             <span className="dash-stat-label">Courses enrolled</span>
@@ -212,9 +212,10 @@ function StudentDashboard(){
           type="button"
           className="download-transcript-button"
           onClick={() => downloadResultPDF({ student, courses: evaluations })}
+          disabled={evaluations.length === 0}
         >
 				Download Transcript
-				<p>Download your academic transcript</p>
+				<p>{evaluations.length === 0 ? "Available once you have results" : "Download your academic transcript"}</p>
         </button>
 			
         

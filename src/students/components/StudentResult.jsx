@@ -89,6 +89,7 @@ function StudentResult(){
 
 
     const gpa = getGpa(courses);
+    const hasResults = courses.length > 0;
 
     // Overall score of selected course
     const overallScore = selectedCourse?.overall ?? 0;
@@ -115,17 +116,17 @@ function StudentResult(){
                             <div className="result-stat-cards">
                                 <div className="result-stat-card">
                                     <div className="result-stat-icon">
-										<img src={totalCourseIcon}/>
+										<img alt="" src={totalCourseIcon}/>
 									</div>
                                     <div>
-                                        <div className="result-stat-label">Total Courses</div>
+                                        <div className="result-stat-label">Courses Evaluated</div>
                                         <div className="result-stat-value">{courses.length}</div>
                                     </div>
                                 </div>
 
                                 <div className="result-stat-card">
                                     <div className="result-stat-icon">
-										<img src={gpaIcon}/>
+										<img alt="" src={gpaIcon}/>
 									</div>
                                     <div>
                                         <div className="result-stat-label">GPA</div>
@@ -135,13 +136,18 @@ function StudentResult(){
 
                                 <div className="result-stat-card">
                                     <div className="result-stat-icon">
-										<img src={performanceIcon}/>
+										<img alt="" src={performanceIcon}/>
 									</div>
                                     <div>
                                         <div className="result-stat-label">Performance Level</div>
-                                        <span className={`result-stat-value ${getPerformanceClass(gpa)}`}>
-                                            {getPerformanceLevel(gpa)}
-                                        </span>
+                                        {hasResults ? (
+                                            <span className={`result-stat-value ${getPerformanceClass(gpa)}`}>
+                                                {getPerformanceLevel(gpa)}
+                                            </span>
+                                        ) : (
+                                            // A new student hasn't been graded yet, so don't call them "Poor"
+                                            <span className="result-stat-value result-stat-empty">No results yet</span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -157,6 +163,13 @@ function StudentResult(){
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {!hasResults && (
+                                            <tr>
+                                                <td colSpan="4" className="result-empty-row">
+                                                    No results yet. Your scores will appear here once your lecturers evaluate you.
+                                                </td>
+                                            </tr>
+                                        )}
                                         {courses.map((course) => {
                                             const courseInfo = courseMap[course.course] || {
                                                 name: course.course,
@@ -195,6 +208,8 @@ function StudentResult(){
                                 <button
                                     onClick={() => downloadResultPDF({ student, courses })}
                                     className="download-result-btn"
+                                    disabled={!hasResults}
+                                    title={hasResults ? "" : "Available once you have results"}
                                 >
                                     Download Result
                                 </button>
@@ -205,7 +220,7 @@ function StudentResult(){
                             <div className="result-panel-card">
                                 <div className="result-panel-header">
                                     <div>
-                                        <div className="result-panel-header-title">{selectedCourse?.course}</div>
+                                        <div className="result-panel-header-title">{selectedCourse?.course || "No course yet"}</div>
                                         <div className="result-panel-header-subtitle">Selected Course</div>
                                     </div>
                                     <button

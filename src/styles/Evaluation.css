@@ -205,7 +205,8 @@
     color: #0d9488;
 }
 
-.level-average {
+.level-average,
+.level-poor {
     background: #fef3c7;
     color: #b45309;
 }

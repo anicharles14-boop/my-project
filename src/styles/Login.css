@@ -136,3 +136,38 @@ a{
     color: #2567EB;
     
 }
+
+/* ---------- Phones ---------- */
+@media (max-width: 500px) {
+    .login-page {
+        padding: 12px;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .login-container {
+        width: 100%;
+        height: auto;
+        padding: 32px 16px;
+    }
+
+    .login-container form,
+    .ep-input-login,
+    .signin {
+        width: 100%;
+    }
+
+    .signin button {
+        width: 100%;
+    }
+
+    /* Keep the eye icon inside the narrower password box */
+    .eye {
+        left: auto;
+        right: 10px;
+    }
+
+    .signin-lock-signin {
+        left: calc(50% - 50px);
+    }
+}

@@ -5,7 +5,32 @@ body{
   margin: 0;
   padding:0;
   background-color: aliceblue;
-  
+  /* One font for the whole app (loaded in index.html). Without this,
+     pages fell back to the browser's default Times font. */
+  font-family: "Inter", Arial, Helvetica, sans-serif;
+  color: #111827;
+}
+/* Buttons and form fields don't pick up the page font by default */
+button, input, select, textarea{
+  font-family: inherit;
+}
+/* "Back to Home" link on the student and admin login pages */
+.auth-back-link{
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #5548e0;
+  font-size: 14px;
+  text-decoration: none;
+}
+.auth-back-link:hover{
+  text-decoration: underline;
+}
+.auth-back-link img{
+  width: 16px;
 }
 .universal-layout{
   display: flex;
@@ -14,6 +39,8 @@ body{
   display: flex;
   flex-direction: column;
   flex: 1;
+  /* Lets wide tables scroll inside their box instead of widening the page */
+  min-width: 0;
   margin-left: 250px;
   animation: page-enter 300ms ease-in both;
 }

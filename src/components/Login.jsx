@@ -9,6 +9,7 @@ import lock from "../assets/lock.svg";
 import eye from "../assets/eye.svg";
 import eyeClose from "../assets/eye-close.svg";
 import signinLock from "../assets/signinLock.svg";
+import arrowBack from "../assets/arrow-back.svg";
 
 import { adminAuth, db } from "../config/firebase";
 
@@ -81,9 +82,14 @@ function Login() {
 
         <div className="login-page">
 
+            <Link to="/" className="auth-back-link">
+                <img src={arrowBack} alt="" />
+                Back to Home
+            </Link>
+
             <div className="login-container">
 
-                <img src={shield} className="shield"/>
+                <img alt="" src={shield} className="shield"/>
 
                 <h1>Admin Login</h1>
                 <p>Sign in to your account</p>
@@ -93,8 +99,8 @@ function Login() {
 
                     <div className="ep-input-login">
 
-                        <img src={emails} className="email"/>
-                        <img src={lock} className="lock" />
+                        <img alt="" src={emails} className="email"/>
+                        <img alt="" src={lock} className="lock" />
                         <img
                             src={showPassword ? eyeClose : eye}
                             className="eye"
@@ -161,7 +167,7 @@ function Login() {
                             type="submit"
                         >
 
-                            <img
+                            <img alt=""
                                 src={signinLock}
                                 className="signin-lock-signin"
                             />
@@ -169,18 +175,6 @@ function Login() {
                             Sign in
 
                         </button>
-
-
-                        <p>
-
-                            Don't have an account?{" "}
-
-                            <Link to="/admin/signup">
-                                Sign up
-                            </Link>
-
-                        </p>
-
 
                     </div>
 

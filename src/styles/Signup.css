@@ -144,3 +144,37 @@ a{
     text-decoration: underline;
     color: #2567EB;
 }
+
+/* ---------- Phones (also used by the student login page) ---------- */
+@media (max-width: 500px) {
+    .signup-page {
+        padding: 12px;
+    }
+
+    .signup-container {
+        width: 100%;
+        min-height: auto;
+        padding: 28px 16px;
+    }
+
+    .signup-container form,
+    .ep-input-signup,
+    .signup-actions {
+        width: 100%;
+    }
+
+    .ep-input-signup input,
+    .signup-actions button {
+        width: 100%;
+    }
+
+    /* Keep the eye icon inside the narrower password box */
+    .eye-signup {
+        left: auto;
+        right: 10px;
+    }
+
+    .signup-lock {
+        left: calc(50% - 48px);
+    }
+}

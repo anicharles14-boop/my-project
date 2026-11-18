@@ -27,7 +27,7 @@ function Navbar(){
 
             <div className="navbar-name-container">
                 <div className="navbar-image">
-                    <img src={shieldHalf}/>
+                    <img alt="" src={shieldHalf}/>
                 </div>
                 
                 <div className="navbar-name">
@@ -40,21 +40,21 @@ function Navbar(){
             <div className="navbar-elements">
                 <NavLink to="/admin/dashboard" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="dashboard" >
-                        <img src={dashboard}/>
+                        <img alt="" src={dashboard}/>
                         Dashboard
                     </div>
                 </NavLink>
                 
                 <NavLink to="/admin/student" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="student">
-                        <img src={student}/>
+                        <img alt="" src={student}/>
                         Students
                     </div>
                 </NavLink>
                 
                 <NavLink to="/admin/evaluation" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="evaluation">
-                        <img src={evaluation}/>
+                        <img alt="" src={evaluation}/>
                         Evaluation
                     </div>
                 </NavLink>
@@ -65,7 +65,7 @@ function Navbar(){
                 
                 <Link className="link navbar-logout" onClick={handleLogoutAdmin}>
                     <div >
-                        <img src={logout}/>
+                        <img alt="" src={logout}/>
                         
                         Logout
                     </div>

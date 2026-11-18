@@ -293,3 +293,10 @@
 
 }
 
+
+/* Shown when no students match the search or filters */
+.student-table td.student-table-empty {
+    padding: 28px 16px;
+    text-align: center;
+    color: #64748b;
+}

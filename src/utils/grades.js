@@ -34,6 +34,23 @@ export const getGpa = (coursesList) => {
     return (totalQualityPoints / totalUnits).toFixed(2);
 };
 
+// Performance label for a single course. It follows the course's A–F grade,
+// so it always agrees with the grade and with the GPA labels below.
+export const getCourseLevel = (score) => {
+    const grade = getGrade(score);
+
+    if (grade === "A") return "Excellent";
+    if (grade === "B") return "Very Good";
+    if (grade === "C") return "Good";
+    if (grade === "F") return "Fail";
+
+    return "Poor";
+};
+
+// Turns a label such as "Very Good" into a CSS-friendly name: "very-good".
+export const levelClassName = (level) =>
+    String(level || "").toLowerCase().replace(/\s+/g, "-");
+
 export const getPerformanceLevel = (gpaValue) => {
     const score = Number(gpaValue) || 0;
 

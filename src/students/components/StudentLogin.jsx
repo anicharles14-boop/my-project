@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import shield from "../../assets/shield.svg";
 import emails from "../../assets/emails.svg";
@@ -7,6 +7,7 @@ import lock from "../../assets/lock.svg";
 import eye from "../../assets/eye.svg";
 import eyeClose from "../../assets/eye-close.svg";
 import signupLock from "../../assets/signinLock.svg";
+import arrowBack from "../../assets/arrow-back.svg";
 import { studentAuth, db } from "../../config/firebase";
 
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
@@ -17,7 +18,9 @@ function StudentLogin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const location = useLocation();
+    // e.g. "Your account has been removed..." when sent here by ProtectedRoute
+    const [errorMessage, setErrorMessage] = useState(location.state?.message || "");
 
     const navigate = useNavigate();
 
@@ -58,6 +61,10 @@ function StudentLogin() {
     return (
 
         <div className="signup-page">
+            <Link to="/" className="auth-back-link">
+                <img src={arrowBack} alt="" />
+                Back to Home
+            </Link>
             <div className="signup-container">
                 <img src={shield} className="shield" alt="shield" />
                 <h1>Student Login</h1>
@@ -110,7 +117,7 @@ function StudentLogin() {
                         </button>
 
                         <p>
-                            Dont have an account? {""}
+                            Don't have an account?{" "}
                             <Link to="/student/registration">Register</Link>
                         </p>
                     </div>

@@ -43,7 +43,9 @@ function Student(){
     const { showConfirm, showMessage } = usePopup();
 
     const handleEditStudent = (student) => {
-        navigate("/admin/evaluation", { 
+        // The id in the address lets the Evaluation page reload the student
+        // if the page is refreshed.
+        navigate(`/admin/evaluation?student=${student.id}`, {
             state: { 
                 student 
             } 
@@ -92,6 +94,8 @@ function Student(){
             setStudents((prevStudents) =>
                 prevStudents.filter((existingStudent) => existingStudent.id !== student.id)
             );
+
+            showMessage(`${studentName} was deleted.`, { variant: "success" });
 
         } catch (error) {
             console.error("Error deleting student:", error);
@@ -185,8 +189,18 @@ function Student(){
                                 </thead>
 
                                 <tbody>
+                                    {filteredStudents.length === 0 && (
+                                        <tr>
+                                            <td colSpan="5" className="student-table-empty">
+                                                {students.length === 0
+                                                    ? "No students have registered yet."
+                                                    : "No students match your search."}
+                                            </td>
+                                        </tr>
+                                    )}
+
                                     {filteredStudents.map((student) => (
-                                    <tr key={student.matric}>
+                                    <tr key={student.id}>
 
                                         <td>{student["matric number"]}</td>
 

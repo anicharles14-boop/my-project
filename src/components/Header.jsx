@@ -25,8 +25,8 @@ function Header() {
 
     return (
         <div className="header-container">
-            <button onClick={displayNav} className="hamburger-menu">
-                <img src={menu} />
+            <button onClick={displayNav} className="hamburger-menu" aria-label="Open menu">
+                <img src={menu} alt="" />
             </button>
 
             <p>

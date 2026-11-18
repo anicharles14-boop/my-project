@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { collection, documentId, getCountFromServer, getDocs, query, where } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { normalizeStudentId } from "../utils/evaluations";
+import { getCourseLevel, levelClassName } from "../utils/grades";
 import studentIcon from "../assets/student.svg";
 import evaluationIcon from "../assets/evaluation.svg";
 import averageIcon from "../assets/average-score-icon.svg";
@@ -154,7 +155,7 @@ function Dashboard(){
                         {/* TOTAL STUDENTS */}
                         <div className="dashboard-stat-card">
                             <div className="dashboard-stat-icon">
-                                <img src={studentIcon}/>
+                                <img alt="" src={studentIcon}/>
                             </div>
 
                             <div className="dashboard-stat-info">
@@ -171,7 +172,7 @@ function Dashboard(){
 
                         <div className="dashboard-stat-card">
                             <div className="dashboard-stat-icon">
-                                <img src={evaluationIcon}/>
+                                <img alt="" src={evaluationIcon}/>
                             </div>
                             <div className="dashboard-stat-info">
                                 <p> Total Evaluations</p>
@@ -184,7 +185,7 @@ function Dashboard(){
 
                         <div className="dashboard-stat-card">
                             <div className="dashboard-stat-icon">
-                                <img src={averageIcon}/>
+                                <img alt="" src={averageIcon}/>
                             </div>
                             <div className="dashboard-stat-info">
                                 <p> Average Score</p>
@@ -194,15 +195,15 @@ function Dashboard(){
                             </div>
                         </div>
 
-                        {/* STUDENTS AT RISK */}
+                        {/* HIGHEST SCORE */}
                         <div className="dashboard-stat-card">
                             <div className="dashboard-stat-icon">
-                                <img src={highestIcon}/>
+                                <img src={highestIcon} alt=""/>
                             </div>
                             <div className="dashboard-stat-info">
-                                <p>Highest score</p>
-                                <h2>{highestScore}</h2>
-                                <span></span>
+                                <p>Highest Score</p>
+                                <h2>{highestScore}%</h2>
+                                <span>Best overall course score</span>
                             </div>
                         </div>
 
@@ -246,15 +247,12 @@ function Dashboard(){
                                             </td>
 
                                             <td>
-                                                {evaluation.level ? (
-                                                    <span
-                                                        className={`performance-badge ${String(evaluation.level).toLowerCase()}`}
-                                                    >
-                                                        {evaluation.level}
-                                                    </span>
-                                                ) : (
-                                                    "—"
-                                                )}
+                                                {/* Worked out from the score, so older saved labels can't disagree with the grade */}
+                                                <span
+                                                    className={`performance-badge ${levelClassName(getCourseLevel(evaluation.overall))}`}
+                                                >
+                                                    {getCourseLevel(evaluation.overall)}
+                                                </span>
                                             </td>
 
                                             <td className="evaluation-date">

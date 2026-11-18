@@ -1,19 +1,43 @@
 import Navbar from "./Navbar";
 import Header from "./Header";
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import "../styles/Evaluation.css";
 import { db } from "../config/firebase";
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import coursesData from "../data/courses";
 import { fetchStudentEvaluations } from "../utils/evaluations";
+import { getCourseLevel, getGrade, levelClassName } from "../utils/grades";
 import { usePopup } from "./PopupContext";
 
 function Evaluation() {
 
     const location = useLocation();
-    const selectedStudent = location.state?.student;
+    const [searchParams] = useSearchParams();
+    const studentIdFromUrl = searchParams.get("student");
+
+    // The Students page passes the student along when you click Edit.
+    // After a page refresh that is gone, so we load the student again
+    // using the id kept in the address (?student=...).
+    const studentFromState = location.state?.student;
+    const [loadedStudent, setLoadedStudent] = useState(null);
+
+    useEffect(() => {
+        if (studentFromState || !studentIdFromUrl) {
+            return;
+        }
+
+        getDoc(doc(db, "students", studentIdFromUrl))
+            .then((studentDoc) => {
+                if (studentDoc.exists()) {
+                    setLoadedStudent({ id: studentDoc.id, ...studentDoc.data() });
+                }
+            })
+            .catch((error) => console.error("Error loading student:", error));
+    }, [studentFromState, studentIdFromUrl]);
+
+    const selectedStudent = studentFromState || loadedStudent;
 
     // Keying by student re-mounts the form when a different student is
     // selected, which resets all of its evaluation state.
@@ -25,10 +49,20 @@ function Evaluation() {
     );
 }
 
+const recommendations = {
+    "Excellent": "Excellent performance. Encourage the student to maintain this level of consistency.",
+    "Very Good": "Very good performance. The student should continue improving weaker areas.",
+    "Good": "Solid performance. Encourage the student to keep building on it.",
+    "Poor": "Below average performance. The student should focus on improving academic weaknesses.",
+    "Fail": "Performance needs improvement. Additional academic support is recommended.",
+};
+
 function EvaluationForm({ selectedStudent }) {
 
     const [selectedCourse, setSelectedCourse] = useState("");
     const [scores, setScores] = useState({});
+    const [savedEvaluations, setSavedEvaluations] = useState({});
+    const [loadingSaved, setLoadingSaved] = useState(Boolean(selectedStudent));
     const [result, setResult] = useState(null);
     const [saving, setSaving] = useState(false);
     const { showMessage } = usePopup();
@@ -41,6 +75,59 @@ function EvaluationForm({ selectedStudent }) {
         )
         : [];
 
+    // Load the scores already saved for this student, so editing a course
+    // starts from its saved scores instead of zeros.
+    useEffect(() => {
+        if (!selectedStudent) {
+            return;
+        }
+
+        fetchStudentEvaluations(db, selectedStudent.id)
+            .then((evaluations) => {
+                const savedByCourse = {};
+                const savedScores = {};
+
+                evaluations.forEach((evaluation) => {
+                    savedByCourse[evaluation.course] = evaluation;
+                    savedScores[evaluation.course] = {
+                        attendance: Number(evaluation.attendance) || 0,
+                        assignment: Number(evaluation.assignment) || 0,
+                        test: Number(evaluation.test) || 0,
+                        exam: Number(evaluation.exam) || 0,
+                    };
+                });
+
+                setSavedEvaluations(savedByCourse);
+                // Anything typed while loading wins over the saved values.
+                setScores((current) => ({ ...savedScores, ...current }));
+            })
+            .catch((error) => {
+                console.error("Error loading saved evaluations:", error);
+                showMessage("Could not load this student's saved scores.", { variant: "error" });
+            })
+            .finally(() => setLoadingSaved(false));
+    }, [selectedStudent, showMessage]);
+
+    const buildResult = (overall) => {
+        const level = getCourseLevel(overall);
+
+        return {
+            overall,
+            grade: getGrade(overall),
+            level,
+            recommendation: recommendations[level],
+        };
+    };
+
+    const handleCourseChange = (e) => {
+        const course = e.target.value;
+        setSelectedCourse(course);
+
+        // Show the saved result for a course that has already been graded.
+        const saved = savedEvaluations[course];
+        setResult(saved ? buildResult(Number(saved.overall) || 0) : null);
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -50,7 +137,7 @@ function EvaluationForm({ selectedStudent }) {
                 ...scores[selectedCourse],
                 [name]: Math.min(100, Math.max(0, Number(value)))
             }
-            
+
         });
     };
 
@@ -68,52 +155,6 @@ function EvaluationForm({ selectedStudent }) {
         currentScores.test * 0.20 +
         currentScores.exam * 0.60
     );
-
-
-    const getPerformance = () => {
-
-        if (overallScore >= 80) return "Excellent";
-
-        if (overallScore >= 70) return "Very Good";
-
-        if (overallScore >= 50) return "Good";
-
-        if (overallScore >= 40) return "Average";
-
-        return "Fail";
-    };
-
-
-    const getRecommendation = () => {
-
-        if (overallScore >= 80)
-            return "Excellent performance. Encourage the student to maintain this level of consistency.";
-
-        if (overallScore >= 70)
-            return "Very good performance. The student should continue improving weaker areas.";
-
-        if (overallScore >= 50)
-            return "Solid performance. Encourage the student to maintain consistency.";
-
-        if (overallScore >= 40)
-            return "Average performance. The student should focus on improving academic weaknesses.";
-
-        return "Performance needs improvement. Additional academic support is recommended.";
-    };
-
-
-    const getLevelClass = (level) => {
-
-        if (level === "Excellent") return "level-excellent";
-
-        if (level === "Very Good") return "level-very-good";
-
-        if (level === "Good") return "level-good";
-
-        if (level === "Average") return "level-average";
-
-        return "level-fail";
-    };
 
 
     const evaluateStudent = async () => {
@@ -135,11 +176,7 @@ function EvaluationForm({ selectedStudent }) {
         setSaving(true);
 
         try {
-            setResult({
-                overall: overallScore,
-                level: getPerformance(),
-                recommendation: getRecommendation(),
-            });
+            setResult(buildResult(overallScore));
             await saveEvaluation();
         } finally {
             setSaving(false);
@@ -170,8 +207,8 @@ function EvaluationForm({ selectedStudent }) {
                 exam: currentScores.exam,
 
                 overall: overallScore,
-                level: getPerformance(),
-                recommendation: getRecommendation(),
+                level: getCourseLevel(overallScore),
+                recommendation: recommendations[getCourseLevel(overallScore)],
 
                 updatedAt: serverTimestamp()
             };
@@ -184,18 +221,28 @@ function EvaluationForm({ selectedStudent }) {
                     evaluationData
                 );
 
+                setSavedEvaluations((current) => ({
+                    ...current,
+                    [selectedCourse]: { ...existingEvaluation, ...evaluationData },
+                }));
+
                 showMessage("Evaluation updated successfully!", { variant: "success" });
 
             } else {
 
                 // No evaluation exists → create one
-                await addDoc(
+                const newEvaluation = await addDoc(
                     collection(db, "evaluations"),
                     {
                         ...evaluationData,
                         createdAt: serverTimestamp()
                     }
                 );
+
+                setSavedEvaluations((current) => ({
+                    ...current,
+                    [selectedCourse]: { id: newEvaluation.id, ...evaluationData },
+                }));
 
                 showMessage("Evaluation saved successfully!", { variant: "success" });
             }
@@ -244,12 +291,14 @@ function EvaluationForm({ selectedStudent }) {
                             <div className= "course-student">
                                 <select
                                     value={selectedCourse}
-                                    onChange={(e) => setSelectedCourse(e.target.value)}
-                                    disabled={!selectedStudent || availableCourses.length === 0}
+                                    onChange={handleCourseChange}
+                                    disabled={!selectedStudent || loadingSaved || availableCourses.length === 0}
                                 >
                                     <option value="">
                                         {selectedStudent
-                                            ? availableCourses.length
+                                            ? loadingSaved
+                                                ? "Loading saved scores..."
+                                                : availableCourses.length
                                                 ? "COURSES"
                                                 : "No courses for this department/level"
                                             : "Select a student first"}
@@ -363,7 +412,7 @@ function EvaluationForm({ selectedStudent }) {
                                 <div className="score">
 
                                     {result
-                                        ? `${result.overall}%`
+                                        ? `${result.overall}% (${result.grade})`
                                         : "—"
                                     }
 
@@ -378,7 +427,7 @@ function EvaluationForm({ selectedStudent }) {
                                 {result && (
 
                                     <span
-                                        className={"level " + getLevelClass(result.level)}
+                                        className={"level level-" + levelClassName(result.level)}
                                     >
                                         {result.level}
                                     </span>

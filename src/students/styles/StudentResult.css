@@ -351,3 +351,33 @@
   font-weight: 500;
 }
 
+
+/* Let grid columns shrink on narrow screens instead of widening the page */
+.result-grid > * {
+  min-width: 0;
+}
+
+/* Shown before a student has any results */
+.result-empty-row {
+  padding: 28px 16px;
+  text-align: center;
+  color: #64748b;
+}
+
+.result-stat-empty {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.download-result-btn:disabled {
+  background: #c4b5fd;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 600px) {
+  .result-dashboard {
+    padding: 16px;
+  }
+}

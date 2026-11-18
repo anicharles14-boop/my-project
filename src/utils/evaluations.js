@@ -41,5 +41,9 @@ export async function fetchStudentEvaluations(database, studentId) {
         });
     });
 
-    return [...evaluationsById.values()];
+    // Sorted by course code (e.g. CSC 101 before CSC 102) so results and
+    // downloaded PDFs always list courses in the same order.
+    return [...evaluationsById.values()].sort((first, second) =>
+        String(first.course).localeCompare(String(second.course), undefined, { numeric: true })
+    );
 }

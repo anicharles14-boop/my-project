@@ -42,3 +42,19 @@
         
     }
 }
+
+/* On phones, let the title wrap instead of being cut off */
+@media (max-width: 700px) {
+    .header-container {
+        height: auto;
+        min-height: 60px;
+        padding: 8px 12px;
+        gap: 12px;
+    }
+
+    .header-container p {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.3;
+    }
+}

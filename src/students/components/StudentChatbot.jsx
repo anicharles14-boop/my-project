@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { getAI, getGenerativeModel, GoogleAIBackend } from "firebase/ai";
-import { studentApp } from "../../config/firebase";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { courseMap, getGrade, getGpa, getPerformanceLevel } from "../../utils/grades";
 import "../styles/StudentChatbot.css";
 
@@ -8,7 +6,48 @@ import "../styles/StudentChatbot.css";
 // "flash" models (the newest ones are capped at ~20 requests/day on free tier).
 const MODEL_NAME = "gemini-3.5-flash-lite";
 
-const ai = getAI(studentApp, { backend: new GoogleAIBackend() });
+// The chatbot talks to the Gemini API directly with a Google AI Studio key
+// (https://aistudio.google.com/apikey) stored in .env.local as
+// VITE_GEMINI_API_KEY. It used to go through Firebase AI Logic, but that now
+// requires App Check registration in the Firebase console.
+// Note: Vite builds this key into the website, so anyone can read it there.
+// Restrict it to your site's domains in Google Cloud > Credentials.
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
+
+// Sends the whole conversation (the API is stateless) and returns the reply text.
+async function askGemini({ systemInstruction, history }) {
+    const response = await fetch(GEMINI_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            contents: history.map((message) => ({
+                role: message.role,
+                parts: [{ text: message.text }],
+            })),
+        }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        const error = new Error(data?.error?.message || `Gemini API error ${response.status}`);
+        error.status = response.status;
+        error.details = data?.error?.details || [];
+        throw error;
+    }
+
+    const text = (data?.candidates?.[0]?.content?.parts || [])
+        .map((part) => part.text || "")
+        .join("")
+        .trim();
+
+    return text || "Sorry, I couldn't come up with an answer to that. Could you rephrase it?";
+}
 
 const formatDate = (createdAt) => {
     if (!createdAt?.toDate) return "unknown";
@@ -91,12 +130,15 @@ const buildSummaryContext = (evaluations = []) => {
 };
 
 const buildSystemInstruction = ({ student = {}, evaluations = [], courses = [] }) => [
-    "You are UniEval Assistant, a friendly academic helper inside a university performance evaluation app.",
-    "You have direct access to THIS student's real profile and academic data (listed below).",
-    "Answer questions about their profile, courses, results, grades, GPA, attendance and study tips using this data.",
-    "Never invent scores, courses or personal details that are not in the data.",
-    "If something is not in the data, say you don't have it and tell them where to look in the app (Dashboard, Result, or Profile pages).",
-    "Keep replies short (2-4 sentences), friendly and practical.",
+    "You are UniEval Assistant, a friendly, knowledgeable helper inside a university performance evaluation app.",
+    "You can help with two kinds of questions:",
+    "1. Questions about THIS student: their profile, courses, results, grades, GPA and attendance. Answer these using only the data listed below.",
+    "2. Anything else: general knowledge, explaining a topic from their courses, maths or coding help, study and exam tips, careers, writing, or everyday questions. Answer these from your own knowledge, the way a helpful general assistant would. Do not refuse just because the topic is not in the student's data.",
+    "Rules for questions about the student:",
+    "- Never invent scores, courses or personal details that are not in the data.",
+    "- If a personal detail is not in the data, say you don't have it and tell them where to look in the app (Dashboard, Result, or Profile pages).",
+    "Keep replies friendly and practical. Use 2-4 sentences for simple questions; give a longer, step-by-step answer when the student asks for an explanation or worked solution.",
+    "Write in plain text without Markdown symbols such as **, # or backticks, because the chat window shows text exactly as written.",
     "",
     "STUDENT PROFILE:",
     buildProfileContext(student),
@@ -116,24 +158,16 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
     const [input, setInput] = useState("");
     const [sending, setSending] = useState(false);
 
-    const chatRef = useRef(null);
     const messagesContainerRef = useRef(null);
 
     const firstName = (student?.name || "").split(" ")[0];
 
-    const model = useMemo(
-        () =>
-            getGenerativeModel(ai, {
-                model: MODEL_NAME,
-                systemInstruction: buildSystemInstruction({ student, evaluations, courses }),
-            }),
+    // Rebuilt whenever the student's data loads or changes, so every reply
+    // uses the latest results.
+    const systemInstruction = useMemo(
+        () => buildSystemInstruction({ student, evaluations, courses }),
         [student, evaluations, courses]
     );
-
-    // Start a fresh chat session whenever the student data changes.
-    useEffect(() => {
-        chatRef.current = null;
-    }, [model]);
 
     // Keep the chat list scrolled to the newest message.
     // This scrolls only the chat container, never the whole page.
@@ -154,41 +188,59 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
             return;
         }
 
-        setMessages((previous) => [...previous, { role: "user", text }]);
+        const userMessage = { role: "user", text };
+
+        // Earlier failed replies are not part of the real conversation.
+        const history = [
+            ...messages.filter((message) => !message.isError),
+            userMessage,
+        ];
+
+        setMessages((previous) => [...previous, userMessage]);
         setInput("");
         setSending(true);
 
         try {
-            if (!chatRef.current) {
-                chatRef.current = model.startChat({});
+            if (!GEMINI_API_KEY) {
+                throw Object.assign(new Error("VITE_GEMINI_API_KEY is not set"), { missingKey: true });
             }
 
-            const result = await chatRef.current.sendMessage(text);
+            const reply = await askGemini({ systemInstruction, history });
 
-            setMessages((previous) => [
-                ...previous,
-                { role: "model", text: result.response.text() },
-            ]);
+            setMessages((previous) => [...previous, { role: "model", text: reply }]);
         } catch (error) {
             console.error("Chatbot error:", error);
 
-            const status = error?.customErrorData?.status;
-            const isQuotaError =
-                status === 429 || /quota|429|too many requests/i.test(error?.message || "");
+            const message = error?.message || "";
+            const isQuotaError = error?.status === 429 || /quota|too many requests/i.test(message);
+            const isKeyError =
+                error?.missingKey ||
+                /api key|API_KEY_INVALID|permission/i.test(message) ||
+                error?.status === 403;
 
             let errorText =
                 "Sorry, I couldn't reach the assistant right now. Please try again in a moment.";
 
-            if (isQuotaError) {
-                const retryDelay = error?.customErrorData?.errorDetails?.find((detail) =>
+            if (isKeyError) {
+                errorText =
+                    "The assistant isn't set up correctly (its API key is missing or invalid). Please contact the site admin.";
+            } else if (isQuotaError) {
+                // Gemini sends the wait time as a string of seconds, e.g. "41s".
+                const retryDelay = error?.details?.find((detail) =>
                     detail["@type"]?.includes("RetryInfo")
                 )?.retryDelay;
+                const retrySeconds = parseInt(retryDelay, 10);
 
-                const retryHours = Math.ceil(parseInt(retryDelay, 10) / 3600);
+                let waitText = "later";
+                if (Number.isFinite(retrySeconds)) {
+                    const minutes = Math.ceil(retrySeconds / 60);
+                    const hours = Math.ceil(retrySeconds / 3600);
+                    waitText = retrySeconds < 3600
+                        ? `in about ${minutes} minute${minutes === 1 ? "" : "s"}`
+                        : `in about ${hours} hour${hours === 1 ? "" : "s"}`;
+                }
 
-                errorText = Number.isFinite(retryHours)
-                    ? `I've reached the free AI limit (20 messages/day). Please try again in about ${retryHours} hour${retryHours === 1 ? "" : "s"}.`
-                    : "I've reached the free AI limit (20 messages/day). Please try again later.";
+                errorText = `I've reached the free AI limit for now. Please try again ${waitText}.`;
             }
 
             setMessages((previous) => [
@@ -211,12 +263,12 @@ function StudentChatbot({ student, evaluations = [], courses = [] }) {
                 <h2>UniEval Assistant</h2>
             </div>
             <p className="chatbot-subtitle">
-                Ask me about your profile, results, or study tips
+                Ask about your results, your courses, or anything else
             </p>
 
             <div className="chatbot-messages" ref={messagesContainerRef}>
                 <div className="chatbot-message chatbot-message-model">
-                    {`Hi ${firstName || "there"}! 👋 I'm your UniEval assistant — ask me about your results, profile, courses, or study tips.`}
+                    {`Hi ${firstName || "there"}! 👋 I'm your UniEval assistant — ask me about your results, profile or courses, or any general question you have.`}
                 </div>
 
                 {messages.map((message, index) => (

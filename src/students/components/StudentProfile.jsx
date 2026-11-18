@@ -9,6 +9,18 @@ import "../styles/StudentProfile.css";
 
 const emptyDraft = { name: "", email: "", phone: "" };
 
+// First letter of the first and last names, e.g. "Test Student Edited" -> "TE".
+function getInitials(fullName) {
+    const words = (fullName || "").trim().split(/\s+/).filter(Boolean);
+
+    if (words.length === 0) return "?";
+
+    const first = words[0].charAt(0);
+    const last = words.length > 1 ? words[words.length - 1].charAt(0) : "";
+
+    return (first + last).toUpperCase();
+}
+
 function StudentProfile() {
     const [studentDocId, setStudentDocId] = useState("");
     const [name, setName] = useState("");
@@ -83,7 +95,6 @@ function StudentProfile() {
         }
 
         const trimmedName = draft.name.trim();
-        const trimmedEmail = draft.email.trim();
         const trimmedPhone = draft.phone.trim();
 
         if (!trimmedName) {
@@ -91,8 +102,9 @@ function StudentProfile() {
             return;
         }
 
-        if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-            setMessage({ type: "error", text: "Please enter a valid email address." });
+        // Same rule as the registration form: 11 digits, e.g. 08012345678
+        if (!/^[0-9]{11}$/.test(trimmedPhone)) {
+            setMessage({ type: "error", text: "Phone number must be 11 digits, e.g. 08012345678." });
             return;
         }
 
@@ -107,12 +119,10 @@ function StudentProfile() {
         try {
             await updateDoc(doc(db, "students", studentDocId), {
                 name: trimmedName,
-                "email address": trimmedEmail,
                 phone: trimmedPhone,
             });
 
             setName(trimmedName);
-            setEmail(trimmedEmail);
             setPhone(trimmedPhone);
             setEditing(false);
             setMessage({ type: "success", text: "Profile updated successfully." });
@@ -141,12 +151,7 @@ function StudentProfile() {
 
                     <div className="student-profile-header-card">
                         <div className="student-profile-avatar">
-                            {displayName
-                                ? displayName
-                                    .split(" ")
-                                    .map(word => word.charAt(0).toUpperCase())
-                                    .join("")
-                                : "?"}
+                            {getInitials(displayName)}
                         </div>
                         <div className="student-profile-header-info">
                             <h2 className="student-profile-name">{displayName}</h2>
@@ -201,20 +206,10 @@ function StudentProfile() {
                                     </div>
                                     <div className="student-profile-info-content">
                                         <span className="student-profile-info-label">Email:</span>
-                                        {editing ? (
-                                            <input
-                                                className="student-profile-edit-input"
-                                                type="email"
-                                                value={draft.email}
-                                                onChange={handleDraftChange("email")}
-                                                disabled={saving}
-                                                aria-label="Email address"
-                                            />
-                                        ) : (
-                                            <span className="student-profile-info-value">
-                                                {email}
-                                            </span>
-                                        )}
+                                        {/* The email is the student's login, so it can't be edited here */}
+                                        <span className="student-profile-info-value">
+                                            {email}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -280,7 +275,7 @@ function StudentProfile() {
                                         </button>
                                     </div>
                                     <p className="student-profile-edit-note">
-                                        Department and level are managed by the school and can't be changed here.
+                                        Your email is your login, and your department and level are managed by the school, so these can't be changed here.
                                     </p>
                                 </>
                             )}

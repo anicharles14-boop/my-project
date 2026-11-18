@@ -1,16 +1,17 @@
 import { createBrowserRouter, RouterProvider, Outlet, ScrollRestoration } from 'react-router-dom';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import Landing from './components/Landing';
 import Dashboard from './components/Dashboard';
 import Student from './components/Students';
 import Evaluation from './components/Evaluation';
-import Setting from './components/Settings';
 import ProtectedRoute from './components/ProtectedRoute';
+import NotFound from './components/NotFound';
+import Terms from './components/Terms';
 import StudentRegistration from './students/components/StudentRegistration';
 import StudentDashboard from './students/components/StudentDashboard';
 import StudentProfile from './students/components/StudentProfile';
 import StudentResult from './students/components/StudentResult';
-import StudentSettings from './students/components/StudentSettings';
 import StudentLogin from './students/components/StudentLogin';
 import { adminAuth, studentAuth } from './config/firebase';
 
@@ -33,7 +34,12 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <StudentLogin />
+        element: <Landing />
+      },
+      {
+        // Old address for the landing page, kept so existing links still work
+        path: "/landing",
+        element: <Landing />
       },
       {
         path: "/admin/signup",
@@ -52,7 +58,7 @@ const router = createBrowserRouter([
         element: <StudentRegistration />
       },
       {
-        element: <ProtectedRoute authInstance={studentAuth} redirectTo="/" />,
+        element: <ProtectedRoute authInstance={studentAuth} redirectTo="/student/login" recordCollection="students" />,
         children: [
           {
             path: "/student/dashboard",
@@ -69,11 +75,11 @@ const router = createBrowserRouter([
         ]
       },
       {
-        path: "/student/settings",
-        element: <StudentSettings />
+        path: "/terms",
+        element: <Terms />
       },
       {
-        element: <ProtectedRoute authInstance={adminAuth} redirectTo="/admin/login" />,
+        element: <ProtectedRoute authInstance={adminAuth} redirectTo="/admin/login" recordCollection="admins" />,
         children: [
           {
             path: "/admin/dashboard",
@@ -86,12 +92,13 @@ const router = createBrowserRouter([
           {
             path: "/admin/evaluation",
             element: <Evaluation />
-          },
-          {
-            path: "/setting",
-            element: <Setting />
           }
         ]
+      },
+      {
+        // Any address that doesn't match a page above
+        path: "*",
+        element: <NotFound />
       }
     ]
   }

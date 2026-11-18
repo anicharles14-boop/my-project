@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { db, studentAuth } from "../../config/firebase";
-import { addDoc, collection } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import shieldHalf from "../../assets/shield-half.svg";
 import studentEvaluation from "../../assets/student-evaluation.svg";
 import chart from "../../assets/chart.svg";
@@ -31,12 +31,60 @@ function StudentRegistration() {
     const [level, setLevel] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [submitting, setSubmitting] = useState(false);
     const navigate = useNavigate();
 
     const studentsCollection = collection(db, "students");
 
+    // Creates the student's profile record for a login account.
+    async function saveStudentRecord(uid) {
+        await addDoc(studentsCollection, {
+            uid: uid,
+            name: name,
+            "matric number": matric,
+            phone: phone,
+            "email address": email,
+            department: department,
+            level: level,
+            role: "student"
+        });
+    }
+
+    // The email already has a login. If that student was deleted by an
+    // admin, their login still exists, so let them back in with the same
+    // password and recreate their record. Otherwise they should log in.
+    async function registerExistingLogin() {
+        let userCredential;
+
+        try {
+            userCredential = await signInWithEmailAndPassword(studentAuth, email, password);
+        } catch {
+            return "An account with this email already exists. Please log in instead.";
+        }
+
+        const existingRecord = await getDocs(
+            query(studentsCollection, where("uid", "==", userCredential.user.uid))
+        );
+
+        if (!existingRecord.empty) {
+            await signOut(studentAuth);
+            return "You already have an account. Please log in instead.";
+        }
+
+        await saveStudentRecord(userCredential.user.uid);
+        return null;
+    }
+
     async function submitDetails(e){
         e.preventDefault();
+
+        if (submitting) {
+            return;
+        }
+
+        setErrorMessage("");
+        setSubmitting(true);
 
         try{
             const userCredential = await createUserWithEmailAndPassword(
@@ -45,20 +93,35 @@ function StudentRegistration() {
                 password
             );
 
-            await addDoc(studentsCollection, {
-                uid: userCredential.user.uid,
-                name: name,
-                "matric number": matric,
-                phone: phone,
-                "email address": email,
-                department: department,
-                level: level,
-                role: "student"
-            })
+            await saveStudentRecord(userCredential.user.uid);
             navigate("/student/dashboard");
         }
         catch(err){
-            console.log(err)
+            console.error("Registration failed:", err);
+
+            if (err?.code === "auth/email-already-in-use") {
+                const problem = await registerExistingLogin().catch(() =>
+                    "Something went wrong. Please try again."
+                );
+
+                if (!problem) {
+                    navigate("/student/dashboard");
+                    return;
+                }
+
+                setErrorMessage(problem);
+            } else if (err?.code === "auth/invalid-email") {
+                setErrorMessage("Please enter a valid email address.");
+            } else if (err?.code === "auth/weak-password") {
+                setErrorMessage("Password must be at least 6 characters long.");
+            } else if (err?.code === "auth/network-request-failed") {
+                setErrorMessage("No internet connection. Please check your connection and try again.");
+            } else {
+                setErrorMessage("Could not create your account. Please try again.");
+            }
+        }
+        finally {
+            setSubmitting(false);
         }
     }
 
@@ -69,16 +132,16 @@ function StudentRegistration() {
                     <div className="header">
                         <div className="brand">
                         <div className="brand-icon">
-                            <img src={shieldHalf}/>
+                            <img alt="" src={shieldHalf}/>
                         </div>
                         <div>
                             <div className="brand-name">UniEval</div>
                             <div className="brand-sub">Performance System</div>
                         </div>
                         </div>
-                        <Link to="/student/login" className="back-link">
-                        <img src={arrowBack}/>
-                        Back to Login
+                        <Link to="/" className="back-link">
+                        <img alt="" src={arrowBack}/>
+                        Back to Home
                         </Link>
                     </div>
             
@@ -94,13 +157,13 @@ function StudentRegistration() {
                             </p>
                 
                             <div className="image-placeholder">
-                                <img src={studentIllustration}/> 
+                                <img alt="" src={studentIllustration}/> 
                             </div>
                 
                             <div className="features">
                                 <div className="feature">
                                 <div className="feature-icon">
-                                    <img src={chart}/>
+                                    <img alt="" src={chart}/>
                                 </div>
                                 <div>
                                     <div className="feature-title">Track Your Performance</div>
@@ -111,7 +174,7 @@ function StudentRegistration() {
                                 </div>
                                 <div className="feature">
                                     <div className="feature-icon">
-                                        <img src={studentEvaluation}/>
+                                        <img alt="" src={studentEvaluation}/>
                                     </div>
                                     <div>
                                         <div className="feature-title">View Evaluations</div>
@@ -122,7 +185,7 @@ function StudentRegistration() {
                                     </div>
                                     <div className="feature">
                                     <div className="feature-icon">
-                                        <img src={download}/>
+                                        <img alt="" src={download}/>
                                     </div>
                                     <div>
                                         <div className="feature-title">Download Reports</div>
@@ -152,7 +215,7 @@ function StudentRegistration() {
                                         <label>Full Name</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                <img src={userName}/>
+                                                <img alt="" src={userName}/>
                                             </span>
                                             <input
                                                 type="text"
@@ -168,14 +231,15 @@ function StudentRegistration() {
                                         <label>Matric Number</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                <img src={matricIcon}/>
+                                                <img alt="" src={matricIcon}/>
                                             </span>
                                             <input
                                                 type="text"
-                                                placeholder="Enter your matric number"
+                                                placeholder="e.g. 2023/123456"
                                                 value={matric}
                                                 onChange={(e) => setMatric(e.target.value)}
                                                 pattern="[0-9]{4}/[0-9]{6}"
+                                                title="Use the format 2023/123456: 4 digits, a slash, then 6 digits"
                                                 required
                                             />
                                         </div>
@@ -187,7 +251,7 @@ function StudentRegistration() {
                                         <label>Email Address</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                <img src={emails}/>
+                                                <img alt="" src={emails}/>
                                             </span>
                                             <input
                                                 type="email"
@@ -203,7 +267,7 @@ function StudentRegistration() {
                                         <label>Phone Number</label>
                                         <div className="input-wrap">
                                         <span className="input-icon">
-                                            <img src={phoneIcon}/>
+                                            <img alt="" src={phoneIcon}/>
                                         </span>
                                         <input
                                             type="tel"
@@ -222,7 +286,7 @@ function StudentRegistration() {
                                         <label>Department</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                <img src={departmentIcon}/>
+                                                <img alt="" src={departmentIcon}/>
                                             </span>
                                             <select
                                                 value={department}
@@ -243,7 +307,7 @@ function StudentRegistration() {
                                         <label>Level</label>
                                         <div className="input-wrap">
                                             <span className="input-icon">
-                                                <img src={levelIcon}/>
+                                                <img alt="" src={levelIcon}/>
                                             </span>
                                             <select
                                                 value={level}
@@ -266,7 +330,7 @@ function StudentRegistration() {
                                     <label>Password</label>
                                     <div className="input-wrap">
                                         <span className="input-icon">
-                                        <img src={lock}/>
+                                        <img alt="" src={lock}/>
                                         </span>
                                         <input
                                             type={showPassword ? "text" : "password"}
@@ -296,13 +360,17 @@ function StudentRegistration() {
                                 <label className="checkbox-row">
                                     <input type="checkbox" required/>
                                     <span>
-                                        I agree to the <a href="#">Terms of Service</a> and{" "}
-                                        <a href="#">Privacy Policy</a>
+                                        I agree to the <Link to="/terms#terms" target="_blank">Terms of Service</Link> and{" "}
+                                        <Link to="/terms#privacy" target="_blank">Privacy Policy</Link>
                                     </span>
                                 </label>
-                
-                                <button type="submit" className="submit-btn">
-                                    Create Account
+
+                                {errorMessage && (
+                                    <p className="form-error" role="alert">{errorMessage}</p>
+                                )}
+
+                                <button type="submit" className="submit-btn" disabled={submitting}>
+                                    {submitting ? "Creating account..." : "Create Account"}
                                 </button>
                             </form>
                         </div>

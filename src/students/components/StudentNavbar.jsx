@@ -15,7 +15,7 @@ function StudentNavbar(){
     async function handleLogout(){
         try{
             await signOut(studentAuth);
-            navigate("/")
+            navigate("/student/login")
         }
         catch(error){
             console.log(error)
@@ -27,7 +27,7 @@ function StudentNavbar(){
 
             <div className="navbar-name-container">
                 <div className="navbar-image">
-                    <img src={shieldHalf}/>
+                    <img alt="" src={shieldHalf}/>
                 </div>
                 
                 <div className="navbar-name">
@@ -40,21 +40,21 @@ function StudentNavbar(){
             <div className="navbar-elements">
                 <NavLink to="/student/dashboard" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="dashboard" >
-                        <img src={dashboard}/>
+                        <img alt="" src={dashboard}/>
                         Dashboard
                     </div>
                 </NavLink>
                 
                 <NavLink to="/student/profile" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="student">
-                        <img src={student}/>
+                        <img alt="" src={student}/>
                         Profile
                     </div>
                 </NavLink>
                 
                 <NavLink to="/student/result" className={({ isActive }) => `link${isActive ? " active" : ""}`}>
                     <div className="evaluation">
-                        <img src={evaluation}/>
+                        <img alt="" src={evaluation}/>
                         Result
                     </div>
                 </NavLink>
@@ -64,7 +64,7 @@ function StudentNavbar(){
                 
                 <Link className="link navbar-logout" onClick={handleLogout}>
                     <div >
-                        <img src={logout}/>
+                        <img alt="" src={logout}/>
                         
                         Logout
                     </div>

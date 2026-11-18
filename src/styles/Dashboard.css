@@ -175,17 +175,25 @@
     font-weight: 500;
 }
 
-.performance-badge.good {
-    background: #dcfce7;
-    color: #16a34a;
-}
 .performance-badge.excellent {
     background: #dcfce7;
     color: #16a34a;
 }
-.performance-badge.average {
+.performance-badge.very-good {
+    background: #dbeafe;
+    color: #2563eb;
+}
+.performance-badge.good {
+    background: #ccfbf1;
+    color: #0d9488;
+}
+.performance-badge.poor {
     background: #fef3c7;
     color: #d97706;
+}
+.performance-badge.fail {
+    background: #fee2e2;
+    color: #dc2626;
 }
 
 /*RESPONSIVE*/
@@ -223,4 +231,8 @@
         min-width: 700px;
     }
 
+}
+/* On phones the table scrolls sideways inside its box instead of widening the page */
+.evaluation-table-wrapper {
+    overflow-x: auto;
 }
